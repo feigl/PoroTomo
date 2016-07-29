@@ -60,9 +60,12 @@ function varargout = csvimport( fileName, varargin )
 %
 % by Ashish Sadanandan
 % downloaded from https://www.mathworks.com/matlabcentral/fileexchange/23573-csvimport
- 
-
+%
 % 06 Apr 2009 (Updated 18 Aug 2011) 
+%
+% 2016 Jul 29 - revised by Elena Reinisch to include a check for proper
+% file format.  Attempts to remove special characters and extra commas from
+% last column of .csv file (assuming last column is notes/comments)
 
 if ( nargin == 0 ) || isempty( fileName )
   [fileName filePath] = uigetfile( '*.csv', 'Select CSV file' );
@@ -247,6 +250,7 @@ end
 data            = cell( nLines, nCols );
 data(1,:)       = rowData;
 emptyRowsIdx    = [];
+
 %Get data for remaining rows
 for ii = 2 : nLines
   rowData       = fgetl( fid );
@@ -264,9 +268,56 @@ for ii = 2 : nLines
     warning( 'csvimport:UnevenColumns', ['Number of data elements on line %d (%d) differs from ' ...
       'that one the first line (%d). Data in this line will be truncated.'], ii, nDataElems, nCols );
     rowData     = rowData(1:nCols);
+    % try to remove extra commas assuming they are in last column (comments
+    % column)
+    if nDataElems > nCols
+        numextracommas = nDataElems - nCols
+        if numextracommas == 1
+            % check first to see if the last column has unreadable
+            % characters
+            rowData(end-1) = regexprep(rowData(end-1), '"', '');
+            rowData(end) = regexprep(rowData(end), '"', '');      
+        end
+        numel(rowData)
+        % check again to see if there are still extra commas suggesting
+        % commas in last column
+        nDataElems    = numel( rowData );
+        if nDataElems > nCols
+            for iii = 1:numextracommas
+                combtext = strcat(rowData(end-1), rowData(end)) 
+                rowData(end) = []
+                rowData(end) = combtext
+                disp('RUN')
+                numel(rowData)
+            end  
+        end
+    end
+    % check again to see if there are still extra commas
+    nDataElems    = numel( rowData );
+    if nDataElems == nCols
+        disp('FIXED: csv file has been successfully edited to remove extra commas and/or unreadable characters')
+    end
+    if nDataElems < nCols
+        warning( 'csvimport:UnevenColumns', ['EVEN AFTER EDITING: Number of data elements on line %d (%d) differs from ' ...
+      'that one the first line (%d). Data in this line will be truncated.'], ii, nDataElems, nCols );
+    rowData     = rowData(1:nCols);
+    end
+    elseif nDataElems > nCols
+    warning( 'csvimport:UnevenColumns', ['Number of data elements on line %d (%d) differs from ' ...
+      'that one the first line (%d). Data in this line will be truncated.'], ii, nDataElems, nCols );
+    rowData     = rowData(1:nCols);
   end
   data(ii,:)    = rowData;
 end
+% for ii = numel(errorLines)
+%     rowData = regexp( rowData, p.delimiter, 'split' );
+%     for iii = 1:numextracommas(ii)
+%         combtext = strcat(rowData(end-1), rowData(end)); 
+%         rowData(end) = [];
+%         rowData(end) = combtext;
+%     end   
+% end
+
 %Close file handle
 fclose( fid );
 data(emptyRowsIdx,:)   = [];
