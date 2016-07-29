@@ -62,7 +62,7 @@ function varargout = csvimport( fileName, varargin )
 % downloaded from https://www.mathworks.com/matlabcentral/fileexchange/23573-csvimport
  
 
-06 Apr 2009 (Updated 18 Aug 2011) 
+% 06 Apr 2009 (Updated 18 Aug 2011) 
 
 if ( nargin == 0 ) || isempty( fileName )
   [fileName filePath] = uigetfile( '*.csv', 'Select CSV file' );
