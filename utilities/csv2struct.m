@@ -1,4 +1,4 @@
-function [DATA, DATA_fields] = csv2struct(csvname)
+function DATA = csv2struct(csvname)
 %function [DATA, DATA_fields] = csv2struct( csvname )
 %   reads the header of a csv file and outputs the labels as strings.  To
 %   be used with csvimport.m
@@ -25,8 +25,20 @@ else %read as text file
 % nrows_csv_wo_header = numel(vals)-1; % count number of rows in csv file
 end
 
+% fid = fopen(csvname,'r');
+% line1 = textscan(fid,'%s\n',1,'delimiter',',')
+% fclose(fid);
+% fprintf(1,'%s\n',char(line1{1:end}));
+% 
+% return
+
 % read data from file 
 [data_matrix] = csvimport(csvname, 'columns', column_labels);
+
+[nr,nc] = size(data_matrix)
+if nr <= 0 
+    error(sprintf('file named %s appears to empty. Consider CRLF issues.\n',csvname));
+end
 
 % make sure column labels are appropriate field headers
 % removes spaces, right parentheses/brackets, replaces left
@@ -44,6 +56,8 @@ column_labels = regexprep(column_labels, '/', '');
 % if throws error, make sure that column labels do not contain special
 % characters, etc.
 DATA = cell2struct(data_matrix, column_labels, 2);
-DATA_fields = fieldnames(DATA);
+%DATA_fields = fieldnames(DATA);
+T=struct2table(DATA);
+DATA=table2struct(T,'ToScalar',true);
 end
 
