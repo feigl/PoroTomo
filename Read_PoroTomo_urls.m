@@ -17,9 +17,9 @@ clear all; close all; clc
 
 % these files are local versions after removing ^M characters by hand AND
 % removing commas by Hand.
-File_names{1} = '/data/PoroTomo/metadata/Brady_Obs_MetadataEOL.csv';        Short_name{1}='VIBE';
-File_names{2} = '/data/PoroTomo/metadata/Reftek_metadataEOL.csv';           Short_name{2}='REFT';
-File_names{3} = '/data/PoroTomo/metadata/Nodal_continuous_metadataEOL.csv'; Short_name{3}='NODE';
+File_names{1} = '/data/PoroTomo/Metadata/Brady_Obs_MetadataEOL.csv';        Short_name{1}='VIBE';
+File_names{2} = '/data/PoroTomo/Metadata/Reftek_metadataEOL.csv';           Short_name{2}='REFT';
+File_names{3} = '/data/PoroTomo/Metadata/Nodal_continuous_metadataEOL.csv'; Short_name{3}='NODE';
 
 % build a structure
 META = struct
