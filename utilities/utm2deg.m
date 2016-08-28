@@ -94,8 +94,9 @@ if n3 == 1
     end
     utmzone = utmzones;
 end
-c=size(utmzone,2);
+c=size(utmzone,2)
 if (c~=4)
+    utmzone
    error('utmzone should be a vector of strings like "30 T"');
 end
 

@@ -203,6 +203,12 @@ if colMode
     colIdx        = zeros( 1, nHeaders );
     for ii = 1 : nHeaders
       result      = strmatch( p.columns{ii}, rowData );
+     
+      if isempty( result)
+          rowData = fgets(fid);
+          rowData = regexp( rowData, p.delimiter, 'split' );
+         result = strmatch( p.columns{ii}, rowData); 
+      end
       if isempty( result )
         fclose( fid );
         error( 'csvimport:UnknownHeader', ['Cannot locate column header ''%s'' in the file ' ...
