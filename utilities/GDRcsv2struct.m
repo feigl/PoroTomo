@@ -15,6 +15,7 @@ function [ METADATA ] = GDRcsv2struct( gdr_csv_url, data_type_short_name )
 %   (NOT Case Sens.)
 % ------------------------------------------------------------
 %  borehole + das --------> DASV
+%  surface + das  --------> DASH
 %  borehole --------------> BORE
 %  nodal    --------------> NODE
 %  reftek   --------------> REFT
@@ -61,41 +62,49 @@ for k = 1:numel(gdr_csv_url)
    % pull name of csv file from url to save file as
    furl_split = regexp(furl, '/', 'split');
    csvname = furl_split{end}
+   % check for % characters
+   csv_split = regexp(csvname, '%', 'split')
+   if numel(csv_split) > 1
+    csvname = strcat(csv_split{1}, '.csv')
+   end
+       
    % assign shortname if needed
    if isshortname == 0
-      if regexpi(csvname, 'borehole') == 1
-          if regexpi(csvname, 'das') == 1
+      if find(regexpi(csvname, 'borehole')) == 1
+          if find(regexpi(csvname, 'das')) == 1
               data_short_name = 'DASV';
           else
               data_short_name = 'BORE';
           end
-      elseif regexpi(csvname, 'nodal') == 1
+      elseif find(regexpi(csvname, 'das')) == 1
+             data_short_name = 'DASH';
+      elseif find(regexpi(csvname, 'nodal')) == 1
           data_short_name = 'NODE';
-      elseif regexpi(csvname, 'reftek') == 1
+      elseif find(regexpi(csvname, 'reftek')) == 1
           data_short_name = 'REFT';
-      elseif regexpi(csvname, 'vibroseis') == 1
+      elseif find(regexpi(csvname, 'vibroseis')) == 1
           data_short_name = 'VIBRO';
-      elseif regexpi(csvname, 'permaseis') == 1
+      elseif find(regexpi(csvname, 'permaseis')) == 1
           data_short_name = 'PERMS';
-      elseif regexpi(csvname, 'insar') == 1
+      elseif find(regexpi(csvname, 'insar')) == 1
           data_short_name = 'INSAR';
-      elseif regexpi(csvname, 'pressure') == 1
+      elseif find(regexpi(csvname, 'pressure')) == 1
           data_short_name = 'PDAT';
-      elseif regexpi(csvname, 'geol') == 1
+      elseif find(regexpi(csvname, 'geol')) == 1
           data_short_name = 'GEOL';
-      elseif regexpi(csvname, 'pump') == 1
+      elseif find(regexpi(csvname, 'pump')) == 1
           data_short_name = 'PUMP';
-      elseif regexpi(csvname, 'temp') == 1
-          if regexpi(csvname, 'dtsv') == 1
+      elseif find(regexpi(csvname, 'temp')) == 1
+          if find(regexpi(csvname, 'dtsv')) == 1
             data_short_name = 'DTSV';  
-          elseif regexpi(csvname, 'dtsh') == 1
+          elseif find(regexpi(csvname, 'dtsh')) == 1
             data_short_name = 'DTSH'; 
           end
-      elseif regexpi(csvname, 'dtsv') == 1
+      elseif find(regexpi(csvname, 'dtsv')) == 1
           data_short_name = 'DTSV';    
-      elseif regexpi(csvname, 'dtsh') == 1
+      elseif find(regexpi(csvname, 'dtsh')) == 1
           data_short_name = 'DTSH';       
-      elseif regexpi(csvname, 'uav') == 1
+      elseif find(regexpi(csvname, 'uav')) == 1
           data_short_name = 'UAV';  
       else
           data_short_name = input('Manual entry of data short name needed:', 's')
