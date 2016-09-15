@@ -64,7 +64,7 @@ xlsx_filenames = textread(xlsx_filename_list, '%s');
 
 for k = 1:numel(xlsx_filenames)
     xlsx_name = xlsx_filenames{k}
-    xlsx_path = strcat('porotomo/PoroTomo/Metadata/', xlsx_name);
+    xlsx_path = strcat('porotomo/PoroTomo/METADATA/', xlsx_name);
    
    % assign shortname if needed
    if isshortname == 0
