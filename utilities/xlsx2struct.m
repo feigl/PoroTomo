@@ -98,9 +98,9 @@ for k = 1:numel(xlsx_filenames)
           end
       elseif find(regexpi(xlsx_name, 'dtsv')) == 1
           data_short_name = 'DTSV'; 
-      elseif find(regexpi(xlsx_name, 'surface')) == 1 && find(regexpi(xlsx_name, 'DAS')) == 1 && find(regexpi(xlsx_name, 'DTS')) == 1 
+      elseif find(regexpi(xlsx_name, 'surface')) == 1 & find(regexpi(xlsx_name, 'DAS')) == 1 & find(regexpi(xlsx_name, 'DTS')) == 1 
           data_short_name = 'DASH_DTSH'; 
-      elseif find(regexpi(xlsx_name, 'borehole')) == 1 && find(regexpi(xlsx_name, 'DAS')) == 1 && find(regexpi(xlsx_name, 'DTS')) == 1 
+      elseif find(regexpi(xlsx_name, 'borehole')) == 1 & find(regexpi(xlsx_name, 'DAS')) == 1 & find(regexpi(xlsx_name, 'DTS')) == 1 
           data_short_name = 'DASV_DTSV'; 
       elseif find(regexpi(xlsx_name, 'dtsh')) == 1
           data_short_name = 'DTSH';       
