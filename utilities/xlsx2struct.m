@@ -12,8 +12,8 @@ function [ METADATA ] = xlsx2struct(xlsx_filename_list, data_type_short_name)
 % KEYWORD IN FILENAME      DATA SHORT NAME
 %   (NOT Case Sens.)
 % ------------------------------------------------------------
-%  borehole + das + dts --> DASV_DTS
-%  surface + das + dts  --> DASH_DTS
+%  borehole + das + dts --> DASV_DTSV
+%  surface + das + dts  --> DASH_DTSH
 %  nodal    --------------> NODE
 %  reftek   --------------> REFT
 %  vibroseis -------------> VIBRO
@@ -98,10 +98,10 @@ for k = 1:numel(xlsx_filenames)
           end
       elseif find(regexpi(xlsx_name, 'dtsv')) == 1
           data_short_name = 'DTSV'; 
-      elseif find(regexpi(xlsx_name, 'surface')) == 1 & find(regexpi(xlsx_name, 'DAS')) == 1 & find(regexpi(xlsx_name, 'DTS')) == 1 
-          data_short_name = 'DASH_DTS'; 
-      elseif find(regexpi(xlsx_name, 'borehole')) == 1 & find(regexpi(xlsx_name, 'DAS')) == 1 & find(regexpi(xlsx_name, 'DTS')) == 1 
-          data_short_name = 'DASV_DTS'; 
+      elseif find(regexpi(xlsx_name, 'surface')) == 1 && find(regexpi(xlsx_name, 'DAS')) == 1 && find(regexpi(xlsx_name, 'DTS')) == 1 
+          data_short_name = 'DASH_DTSH'; 
+      elseif find(regexpi(xlsx_name, 'borehole')) == 1 && find(regexpi(xlsx_name, 'DAS')) == 1 && find(regexpi(xlsx_name, 'DTS')) == 1 
+          data_short_name = 'DASV_DTSV'; 
       elseif find(regexpi(xlsx_name, 'dtsh')) == 1
           data_short_name = 'DTSH';       
       elseif find(regexpi(xlsx_name, 'uav')) == 1
