@@ -118,9 +118,37 @@ for k = 1:numel(xlsx_filenames)
 
     % load data from file to table
     data = readtable(xlsx_path);
+    [ndata nfields] = size(data);
+    
+    % check if values were recorded correctly (indication of  a second
+    % header line in file)
+    check = 0;
+    for k = 1:nfields
+        % count number of fields with class double
+       check =  check+double(strcmp(class(data.(k)), 'double'));
+    end
+    
+    % if no fields are class double, then 2 header lines are present
+    if check == 0
+        fprintf('\n')
+        disp('NOTE: Possibility of 2 header lines detected.  Assigning information in second line as separate field of units. Please double check result.')
+        fprintf('\n')
+        
+        % pull unit label line from table
+        uvals = table2array(data(1,:));
+        data(1,:) = [];
+        
+        % assign units to variable names
+        data.Properties.VariableUnits = uvals;
+    end
     
     % convert data to structure 
     METADATA.(data_short_name) = table2struct(data,'ToScalar',true);
+    
+    % add extra field for units if not already included in field names
+    if check == 0
+        METADATA.(data_short_name).Units = data.Properties.VariableUnits;
+    end
 
 end
 
