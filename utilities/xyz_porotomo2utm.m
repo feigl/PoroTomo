@@ -1,7 +1,7 @@
 function [UTM_easting_in_meters,UTM_northing_in_meters, UTM_height_in_meters] = xyz_porotomo2utm(x_rotated_in_meters, y_rotated_in_meters, z_rotated_in_meters)
 %function [UTM_easting_in_meters,UTM_northing_in_meters] = xy_porotomo2utm(x_rotated_in_meters, y_rotated_in_meters)
 % given (x,y) in rotated coordinate system, return (e,n) in UTM
-% 20160614 Elena Reinisch, based on code from Kurt Feigl, Mike Cardiff, and
+% 20170305 Elena Reinisch, based on code from Kurt Feigl, Mike Cardiff, and
 % Christina Morency
 
 %% Intialize
