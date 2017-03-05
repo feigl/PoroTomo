@@ -1,4 +1,4 @@
-function [UTM_easting_in_meters,UTM_northing_in_meters] = xy_porotomo2utm(x_rotated_in_meters, y_rotated_in_meters)
+function [UTM_easting_in_meters,UTM_northing_in_meters, UTM_height_in_meters] = xyz_porotomo2utm(x_rotated_in_meters, y_rotated_in_meters, z_rotated_in_meters)
 %function [UTM_easting_in_meters,UTM_northing_in_meters] = xy_porotomo2utm(x_rotated_in_meters, y_rotated_in_meters)
 % given (x,y) in rotated coordinate system, return (e,n) in UTM
 % 20160614 Elena Reinisch, based on code from Kurt Feigl, Mike Cardiff, and
@@ -14,6 +14,11 @@ i=i+1;bradybox_UTM(i,:) = [ 328761.1411         4408840.1323]; % Top Left corner
 i=i+1;bradybox_UTM(i,:) = [ 327850.8122         4407606.2053]; % Top Right
 i=i+1;bradybox_UTM(i,:) = [ 328221.6320         4407332.5948];
 i=i+1;bradybox_UTM(i,:) = [ 329137.6472         4408559.8842];
+
+% Z-axis
+origin_UTM_z = 800; % m
+origin_porotomo_z = 0; % m
+delta_z = origin_porotomo_z - origin_UTM_z; % m
 
 % X-axis points 
 xaxisvec_UTM = bradybox_UTM(3,:) - bradybox_UTM(2,:);
@@ -41,7 +46,7 @@ outlist = rotate_2d(inlist, 360 - theta) + repmat(origin_UTM,size(inlist,1),1);
 
 UTM_easting_in_meters = outlist(:,1);
 UTM_northing_in_meters = outlist(:,2);
-
+UTM_height_in_meters = z_rotated_in_meters - delta_z;
 
 return
 
