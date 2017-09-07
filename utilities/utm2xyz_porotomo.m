@@ -1,7 +1,7 @@
 function [x_rotated_in_meters, y_rotated_in_meters, z_rotated_in_meters] = utm2xyz_porotomo(UTM_easting_in_meters,UTM_northing_in_meters, UTM_height_in_meters)
-%function [x_rotated_in_meters, y_rotated_in_meters] = utm2xy_porotomo(UTM_easting_in_meters,UTM_northing_in_meters)
-% given (e,n) in UTM, return (x,y) in rotated coordinate system
-% 20170305 Elena C Reinisch and Kurt Feigl, based on code from Mike Cardiff and Christina
+%function [x_rotated_in_meters, y_rotated_in_meters, z_rotated_in_meters] = utm2xyz_porotomo(UTM_easting_in_meters,UTM_northing_in_meters, UTM_height_in_meters)
+% given (e,n, v) in UTM, return (x,y, z) in rotated coordinate system
+% 20170411 Elena C Reinisch and Kurt Feigl, based on code from Mike Cardiff and Christina
 % Morency
 
 %% Intialize
@@ -27,7 +27,7 @@ xaxisvec_UTM = bradybox_UTM(3,:) - bradybox_UTM(2,:);
 origin_UTM = bradybox_UTM(2,:);
 
 %Degrees of rotation from Northing/Easting for coordinate rotation.
-theta = atan2d(xaxisvec_UTM(2),xaxisvec_UTM(1))
+theta = atan2d(xaxisvec_UTM(2),xaxisvec_UTM(1));
 
 %theta   -36.4219 % degrees
 
