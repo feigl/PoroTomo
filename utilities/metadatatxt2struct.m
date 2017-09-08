@@ -31,10 +31,7 @@ fname_centroids = sprintf('%s/%s', 'MESH_topo_xpypzellipsoid_800', char(url_splt
 
 %% read the file containing coordinates of nodes
 % pull most recent, stable version from GitHub and save to text file
-data = webread(nodes_url);
-fid_data = fopen(fname_nodes,'w');
-fwrite(fid_data, data);
-fclose(fid_data);
+websave(fname_nodes, nodes_url);
 
 % read text file
 fid_nodes = fopen(fname_nodes,'rt');
@@ -56,10 +53,7 @@ end
 
 %% read the file containing the list of elements
 % pull most recent, stable version from GitHub and save to text file
-data = webread(elements_url);
-fid_data = fopen(fname_elements,'w');
-fwrite(fid_data, data);
-fclose(fid_data);
+websave(fname_elements, elements_url);
 
 % read text file
 fid_elements = fopen(fname_elements,'rt');
@@ -82,10 +76,7 @@ end
 
 %% read the file containing coordinates of centroids
 % pull most recent, stable version from GitHub and save to text file
-data = webread(centroids_url);
-fid_data = fopen(fname_centroids,'w');
-fwrite(fid_data, data);
-fclose(fid_data);
+websave(fname_centroids, centroids_url);
 
 % read text file
 fid_centroids = fopen(fname_centroids,'rt');
