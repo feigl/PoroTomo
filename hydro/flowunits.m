@@ -4,11 +4,21 @@
 format compact
 echo on
 
-dVdt=unit(31e3,'m^3/year')
+%% average rate from from Ali et al. 2016 (2016), page 117
+dVdt=unit(48.2e3,'m^3/year')
 convert(dVdt,'m^3/year')
 convert(dVdt,'liter/s')
 convert(dVdt,'gallon/minute')
 
+%% fn0 = '../intf/In20130513_20140511/drhomaskd_utm.grd';
+dV = unit(-23556.7,'m^3')
+dt = unit(years(datetime(2014,05,11)-datetime(2013,05,13)),'year')
+dVdt=dV/dt;
+convert(dVdt,'m^3/year')
+convert(dVdt,'liter/s')
+convert(dVdt,'gallon/minute')
+
+%%
 dV = unit(-0.38e6,'m^3')
 convert(dV,'m^3')
 convert(dV,'liter')
