@@ -4,6 +4,7 @@
 % Downloads metadata files from the PoroTomo GitHub repo (master branch),
 % loads data to structures, and saves all structures to an array
 % currently pulls: nodes_coords_file, mesh_file, and centroids_coords_file
+% Update ECR 20170920 adding section for downloading xlsx files from GitHub
 
 %% Initialize
 clear all;
@@ -99,6 +100,122 @@ end
 save('MESH.mat', 'NODES', 'ELEMENTS', 'CENTROIDS')
 
 %% Get xlsx files
+% Initialize structure
+METADATA = struct;
+
 % pull down list of metadata xlsx files
 xlsxlist_url = 'https://github.com/feigl/PoroTomo/raw/master/metadata_txt_files/xlsx_list.txt';
 websave('xlsx_list.txt', xlsxlist_url)
+
+% load names
+xlsx_table = readtable('xlsx_list.txt', 'ReadVariableNames', 0);
+
+% initialize text file for writing short name mapping keys 
+fid = fopen('metadata_name_mapping.txt', 'w+');
+
+% figure out path to wget 
+% try first to find GNU or FreeBSD version
+[test1, wgetpath] = unix('find /usr -name wget -print -quit');
+% if neither of those, try NetBSD
+if isempty(strfind(wgetpath, '/wget'))
+    [test1, wgetpath] = unix('find /usr -name wget -print -exit');
+    % if still can't find version with quick method, print out all matches
+    % and then take path
+    if isempty(strfind(wgetpath, '/wget'))
+        [test1, wgetpath] = unix('find /usr -name wget | head -1');
+    end
+end
+
+% cycle through names, pulling each file down and saving to structure as we go
+for k = 1:numel(xlsx_table)
+   xlsx_name =  char(table2array(xlsx_table(k,1)))
+   
+   % get data file from GITHub
+   command = strcat(wgetpath, ' --no-check-certificate https://raw.githubusercontent.com/feigl/PoroTomo/master/metadata_txt_files/', xlsx_name);
+   system(command);
+   
+   % read file that has been downloaded
+   data = readtable(xlsx_name, 'ReadVariableNames', 1); 
+   [ndata nfields] = size(data);
+   
+   % assign shortname
+   if find(regexpi(xlsx_name, 'nodal')) == 1
+       data_short_name = 'NODE';
+   elseif find(regexpi(xlsx_name, 'reftek')) == 1
+       data_short_name = 'REFT';
+   elseif find(regexpi(xlsx_name, 'vibroseis')) == 1
+       data_short_name = 'VIBRO';
+%    elseif find(regexpi(xlsx_name, 'temp')) == 1
+%        if find(regexpi(xlsx_name, 'dtsv')) == 1
+%            data_short_name = 'DTSV';
+%        elseif find(regexpi(xlsx_name, 'dtsh')) == 1
+%            data_short_name = 'DTSH';
+%        end
+   elseif find(regexpi(xlsx_name, 'surface')) == 1 & find(regexpi(xlsx_name, 'DAS')) == 1 & find(regexpi(xlsx_name, 'DTS')) == 1
+       data_short_name = 'DASsurf_DTSsurf';
+   elseif find(regexpi(xlsx_name, 'borehole')) == 1 & find(regexpi(xlsx_name, 'DAS')) == 1 & find(regexpi(xlsx_name, 'DTS')) == 1
+       data_short_name = 'DASV_DTSV';
+   elseif find(regexpi(xlsx_name, 'horizontal')) == 1 & find(regexpi(xlsx_name, 'DAS')) == 1 & find(regexpi(xlsx_name, 'DTS')) == 1
+       data_short_name = 'DASH_DTSH';
+   elseif find(regexpi(xlsx_name, 'dtsv')) == 1
+       data_short_name = 'DTSV';
+   elseif find(regexpi(xlsx_name, 'dtsh')) == 1
+       data_short_name = 'DTSH';
+   elseif find(regexpi(xlsx_name, 'permaseis')) == 1
+       data_short_name = 'PERMS';
+   elseif find(regexpi(xlsx_name, 'insar')) == 1
+       data_short_name = 'INSAR';
+   elseif find(regexpi(xlsx_name, 'pressure')) == 1
+       data_short_name = 'PDAT';
+   elseif find(regexpi(xlsx_name, 'geol')) == 1
+       data_short_name = 'GEOL';
+   elseif find(regexpi(xlsx_name, 'pump')) == 1
+       data_short_name = 'PUMP';
+   elseif find(regexpi(xlsx_name, 'uav')) == 1
+       data_short_name = 'UAV';
+   else
+       data_short_name = input('Manual entry of data short name needed:', 's')
+   end
+
+   % save name of short name to file
+   fprintf(fid, '%s %s\n', data_short_name, xlsx_name);
+   
+   % check if values were recorded correctly (indication of  a second
+    % header line in file)
+    check = 0;
+    for k = 1:nfields
+        % count number of fields with class double
+       check =  check+double(strcmp(class(data.(k)), 'double'));
+    end
+    
+    % if no fields are class double, then 2 header lines are present
+    if check == 0
+        fprintf('\n')
+        disp('NOTE: Possibility of 2 header lines detected.  Assigning information in second line as separate field of units. Please double check result.')
+        fprintf('\n')
+        
+        % pull unit label line from table
+        uvals = table2array(data(1,:));
+        data(1,:) = [];
+        
+        % assign units to variable names
+        data.Properties.VariableUnits = uvals;
+    end
+    
+    % convert data to structure 
+    METADATA.(data_short_name) = table2struct(data,'ToScalar',true);
+    
+    % add extra field for units if not already included in field names
+    if check == 0
+        METADATA.(data_short_name).Units = data.Properties.VariableUnits;
+    end
+   
+end
+
+% close name mapping file
+fclose(fid);
+
+% save metadata to .mat file with date in name
+ save(strcat('METADATA_', date, '.mat'), 'METADATA')
+ 
+ fprintf('Downloads have completed. Data is saved to %s \n', strcat('METADATA_', date, '.mat'))
