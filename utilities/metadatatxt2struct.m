@@ -98,12 +98,4 @@ end
 
 save('MESH.mat', 'NODES', 'ELEMENTS', 'CENTROIDS')
 
-% %% draw the mesh in 3-D
-% figure; hold on;
-% % plot3(ELEMENTS.centroid_xp,ELEMENTS.centroid_yp,ELEMENTS.centroid_zp,'*r');
-% plot3(CENTROIDS.xp,CENTROIDS.yp,CENTROIDS.zp,'*r');
-% 
-% % very slow
-% % for i=1:n_elements
-% %     plot3(ELEMENTS.centroid_xp(i),ELEMENTS.centroid_yp(i),ELEMENTS.centroid_zp(i),'*r');
-% % end
+%% Get xlsx files
