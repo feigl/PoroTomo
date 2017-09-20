@@ -101,4 +101,4 @@ save('MESH.mat', 'NODES', 'ELEMENTS', 'CENTROIDS')
 %% Get xlsx files
 % pull down list of metadata xlsx files
 xlsxlist_url = 'https://github.com/feigl/PoroTomo/raw/master/metadata_txt_files/xlsx_list.txt';
-websave('xlsx_list.txt', xlsxlist_url)
+websave
