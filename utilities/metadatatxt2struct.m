@@ -151,8 +151,8 @@ for k = 1:numel(xlsx_table)
 %        elseif find(regexpi(xlsx_name, 'dtsh')) == 1
 %            data_short_name = 'DTSH';
 %        end
-   elseif find(regexpi(xlsx_name, 'surface')) == 1 & find(regexpi(xlsx_name, 'DAS')) == 1 & find(regexpi(xlsx_name, 'DTS')) == 1
-       data_short_name = 'DASsurf_DTSsurf';
+%    elseif find(regexpi(xlsx_name, 'surface')) == 1 & find(regexpi(xlsx_name, 'DAS')) == 1 & find(regexpi(xlsx_name, 'DTS')) == 1
+%        data_short_name = 'DASsurf_DTSsurf';
    elseif find(regexpi(xlsx_name, 'borehole')) == 1 & find(regexpi(xlsx_name, 'DAS')) == 1 & find(regexpi(xlsx_name, 'DTS')) == 1
        data_short_name = 'DASV_DTSV';
    elseif find(regexpi(xlsx_name, 'horizontal')) == 1 & find(regexpi(xlsx_name, 'DAS')) == 1 & find(regexpi(xlsx_name, 'DTS')) == 1
