@@ -11,9 +11,9 @@ n_centroids2 = numel(CENTROIDS.id);
 fclose(fid_centroids);
 if  n_centroids1 == n_centroids2
     n_centroids = n_centroids1
-    CENTROIDS.xp = C{2};  % Centroid coordinate [m] Xp in rotated PoroTomo system
-    CENTROIDS.yp = C{3};  % Centroid coordinate [m] Yp in rotated PoroTomo system
-    CENTROIDS.zp = C{4};  % Centroid coordinate [m] Zp in rotated PoroTomo system
+    CENTROIDS.Xp = C{2};  % Centroid coordinate [m] Xp in rotated PoroTomo system
+    CENTROIDS.Yp = C{3};  % Centroid coordinate [m] Yp in rotated PoroTomo system
+    CENTROIDS.Zp = C{4};  % Centroid coordinate [m] Zp in rotated PoroTomo system
 else
     n_centroids1
     n_centroids2

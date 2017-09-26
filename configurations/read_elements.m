@@ -2,7 +2,7 @@ function ELEMENTS = read_elements(fname_elements )
 % read the file containing the list of elements for a hexahedral mesh with
 % 8 nodes per element
 % 2017 Kurt Feigl
-fname_elements = 'MESH_topo_xpypzellipsoid_800/mesh_file';
+%fname_elements = 'MESH_topo_xpypzellipsoid_800/mesh_file';
 fid_elements = fopen(fname_elements,'rt');
 n_elements1 = sscanf(fgetl(fid_elements),'%d'); % get the number of elements
 C = textscan(fid_elements,'%d %d %d %d %d %d %d %d %d');
