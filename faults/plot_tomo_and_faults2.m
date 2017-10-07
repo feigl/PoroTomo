@@ -1,4 +1,4 @@
-function figfilenames = plot_tomo_and_faults(TOMO,FAULTS,title_str,SLICES,OPTIONS,funprint)
+function figfilenames = plot_tomo_and_faults2(TOMO,FAULTS,title_str,SLICES,OPTIONS,funprint)
 % make slices at SLICES of tomogram TOMO with faults in FAULTS
 % 20170921 Kurt Feigl
 
@@ -14,12 +14,14 @@ if exist('OPTIONS','var') == 1
     if isfield(OPTIONS,'vmin') == 1
         vmin=OPTIONS.vmin;
     else
-        vmin=nanmin(colvec(TOMO.V));
+        %vmin=nanmin(colvec(TOMO.V));
+        vmin = nan;
     end
     if isfield(OPTIONS,'vmax') == 1
         vmax=OPTIONS.vmax;
     else
-        vmax=nanmax(colvec(TOMO.V));
+        %vmax=nanmax(colvec(TOMO.V));
+        vmax = nan;
     end
     if isfield(OPTIONS,'cmap') == 1
         cmap=OPTIONS.cmap;
@@ -87,19 +89,23 @@ for knorm = [1,2,3]
                 error(sprintf('unknown knorm = %d\n',knorm));
         end
         % interpolate values from 3D onto the 2-D mesh
-        image2d = griddata(TOMO.Xp,TOMO.Yp,TOMO.Zp,TOMO.V,Q.x,Q.y,Q.z,interpolation_method);
+        %image2d = griddata(TOMO.Xp,TOMO.Yp,TOMO.Zp,TOMO.V,Q.x,Q.y,Q.z,interpolation_method);
+        extrapolation_method = 'none';
+        Finterp2 = scatteredInterpolant(TOMO.Xp,TOMO.Yp,TOMO.Zp,TOMO.V ...
+            ,interpolation_method,extrapolation_method);
+        image2d = Finterp2(Q.x,Q.y,Q.z);
         
-        % make a finer mesh with 10-meter spacing
+       % make a finer mesh with 10-meter spacing
         switch knorm
             case 1
-                [M1,M2] = meshgrid([unique(min(SLICES.Yp)):10:unique(max(SLICES.Yp))]...
-                    ,[unique(min(SLICES.Zp)):10:unique(max(SLICES.Zp))]);
+                [M1,M2] = meshgrid([ceil(nanmin(colvec(SLICES.Yp))):10:floor(nanmax(colvec(SLICES.Yp)))]...
+                                  ,[ceil(nanmin(colvec(SLICES.Zp))):10:floor(nanmax(colvec(SLICES.Zp)))]);
             case 2
-                [M1,M2] = meshgrid([unique(min(SLICES.Xp)):10:unique(max(SLICES.Xp))]...
-                    ,[unique(min(SLICES.Zp)):10:unique(max(SLICES.Zp))]);
-            case 3
-                [M1,M2] = meshgrid([unique(min(SLICES.Xp)):10:unique(max(SLICES.Xp))]...
-                    ,[unique(min(SLICES.Yp)):10:unique(max(SLICES.Yp))]);
+                [M1,M2] = meshgrid([ceil(nanmin(colvec(SLICES.Xp))):10:floor(nanmax(colvec(SLICES.Xp)))]...
+                                  ,[ceil(nanmin(colvec(SLICES.Zp))):10:floor(nanmax(colvec(SLICES.Zp)))]);
+             case 3
+                [M1,M2] = meshgrid([ceil(nanmin(colvec(SLICES.Xp))):10:floor(nanmax(colvec(SLICES.Xp)))]...
+                                  ,[ceil(nanmin(colvec(SLICES.Yp))):10:floor(nanmax(colvec(SLICES.Yp)))]);
             otherwise
                 error(sprintf('unknown knorm = %d\n',knorm));
         end
@@ -146,7 +152,11 @@ for knorm = [1,2,3]
             
             % setting the velocity range for plotting
             %caxis([v1, v2]);
-            caxis([vmin,vmax]);
+            if isfinite(vmin) == 1 && isfinite(vmax)==1
+                caxis([vmin,vmax]);
+            else
+                caxis([nanmin(colvec(image2dinterp)),nanmax(colvec(image2dinterp))]);
+            end
             caxis manual;
             %colormap(flipud(colormap('jet')));
             colormap(cmap);
