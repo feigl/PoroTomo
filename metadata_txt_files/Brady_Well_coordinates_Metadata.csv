@@ -1,0 +1,18 @@
+Well Name,Activity during PoroTomo Testing,UTM Zone,X Coordinate (UTM m E),Y Coordinate (UTM m N),Land Surf Elev (m above WGS84 Ellipsoid),Perf Depth Top Elev (m),Perf Depth Btm Elev (m) ,Slotted Depth Top Elev (m),Slotted Depth Btm Elev (m),Open Hole Top Elev (m),Open Hole Btm Eleve (m),Position Source,Notes
+18B-31,Inj,11 S,328789.55,4408711.47,1253.65,1133.68,1022.61,1150.02,1025.05,,,points160324ll_wells.txt,
+18D-31,Inj,11 S,328750.14,4408629.76,1252.34,1155.26,1052.24,,,,,points160324ll_wells.txt,
+73-25,Inj,11 S,328181.33,4401656.23,1232.47,1112.99,1047.46,,,1047.46,1045.94,Bradys_Master_Porotomo_2015-1-13.xlsx,
+81A-1,Inj,11 S,328604.53,4408551.68,1248.30,,,,,1128.52,1036.16,points160324ll_wells.txt,
+81-1,Obs (GPS),11 S,328562.04,4408507.26,1245.67,,,,,1157.37,1022.04,Bradys_Master_Porotomo_2015-1-13.xlsx,
+56A-1,Obs (Kuster),11 S,327857.74,4407556.31,1227.87,805.26,684.26,,,,,points160324ll_wells.txt,
+81B-1,Obs (MadgeTek),11 S,328527.01,4408432.02,1246.05,1146.38,1041.53,,,,,points160324ll_wells.txt,
+SP-2,Obs (MadgeTek),11 S,328126.29,4407627.97,1236.07,,,778.56,-115.72,,,points160324ll_wells.txt,Labeled as SP-2/MG-2 in source spreadsheet
+56-1,Obs (Vertical DAS),11 S,327961.92,4407555.35,1230.27,,,921.20,867.56,867.56,504.24,points160324ll_wells.txt,
+18-1,Pumping,11 S,327024.73,4407032.58,1223.50,-159.54,-519.05,,,-519.35,-523.01,points160324ll_wells.txt,
+27-1,Pumping,11 S,327254.25,4407205.19,1222.00,,,34.50,-142.59,-350.46,-555.59,points160324ll_wells.txt,Labeled as 27-1RD in source spreadsheet. Measured depth assumed as bottom of given slotted depth value
+47C-1,Pumping,11 S,327745.26,4407308.58,1227.00,,,814.60,654.28,654.28,648.49,points160324ll_wells.txt,
+48A-1,Pumping,11 S,327703.86,4407181.58,1226.40,883.19,846.92,,,846.92,844.79,points160324ll_wells.txt,Labeled as 48A-1/47B-1 in source spreadsheet
+82A-11,Pumping,11 S,326904.91,4406708.46,1220.59,,,205.61,-578.34,-578.34,-597.84,points160324ll_wells.txt,Labeled as 82A-11RD3 in source spreadsheet
+46-1,None,11 S,327805.01,4407484.76,1229.82,831.75,733.61,,,,,Bradys_Master_Porotomo_2015-1-13.xlsx,
+BCH-7,None,11 S,328067.17,4401356.87,1224.95,,,,,,,Bradys_Master_Porotomo_2015-1-13.xlsx,
+BCH-10,None,11 S,327913.84,4401962.06,1231.80,,,,,,,Bradys_Master_Porotomo_2015-1-13.xlsx,

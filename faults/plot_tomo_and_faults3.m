@@ -1,4 +1,4 @@
-function figfilenames = plot_tomo_and_faults2(TOMO,FAULTS,title_str,SLICES,OPTIONS,funprint,rsearch)
+function figfilenames = plot_tomo_and_faults3(TOMO,FAULTS,title_str,SLICES,OPTIONS,funprint,rsearch, WELLS)
 % make slices at SLICES of tomogram TOMO with faults in FAULTS
 % 20170921 Kurt Feigl
 
@@ -9,6 +9,8 @@ figfilenames=[];
 nx = size(TOMO.Xp)
 ny = size(TOMO.Yp)
 nz = size(TOMO.Zp)
+
+tstart = tic;
 
 % set faults
 if exist('OPTIONS','var') == 1
@@ -53,6 +55,11 @@ if exist('OPTIONS','var') == 1
         interpolation_method=OPTIONS.interpolation_method;
     else
         interpolation_method = 'linear';
+    end
+    if isfield(OPTIONS,'extrapolation_method') == 1
+        extrapolation_method=OPTIONS.extrapolation_method;
+    else
+        extrapolation_method = 'linear';
     end
 end
 
@@ -111,25 +118,42 @@ for knorm = [1,2,3]
             case 1
                 ikeep = intersect(ikeep,find(abs(TOMO.Xp - SLICES.Xp(kslice)) < rsearch));
                 nkeep = numel(ikeep)
-                [Q.x,Q.y,Q.z] = meshgrid(SLICES.Xp(kslice),colvec(TOMO.Yp(ikeep)),colvec(TOMO.Zp(ikeep)));
+                [Q.x,Q.y,Q.z] = meshgrid(SLICES.Xp(kslice),unique(colvec(TOMO.Yp(ikeep))),unique(colvec(TOMO.Zp(ikeep))));
             case 2
                 ikeep = intersect(ikeep,find(abs(TOMO.Yp - SLICES.Yp(kslice)) < rsearch));
                 nkeep = numel(ikeep)
-                [Q.x,Q.y,Q.z] = meshgrid(colvec(TOMO.Xp(ikeep)),SLICES.Yp(kslice),colvec(TOMO.Zp(ikeep)));
+                [Q.x,Q.y,Q.z] = meshgrid(unique(colvec(TOMO.Xp(ikeep))),SLICES.Yp(kslice),unique(colvec(TOMO.Zp(ikeep))));
             case 3
                 ikeep = intersect(ikeep,find(abs(TOMO.Zp - SLICES.Zp(kslice)) < rsearch));
                 nkeep = numel(ikeep)
-                [Q.x,Q.y,Q.z] = meshgrid(colvec(TOMO.Xp(ikeep)),TOMO.Yp(ikeep),SLICES.Zp(kslice));
+                [Q.x,Q.y,Q.z] = meshgrid(unique(colvec(TOMO.Xp(ikeep))),unique(colvec(TOMO.Yp(ikeep))),SLICES.Zp(kslice));
             otherwise
                 error(sprintf('unknown knorm = %d\n',knorm));
         end
+        
+        % remove singletons to make 2-D meshes
+        switch knorm
+            case 1
+                Q1 = squeeze(Q.y);
+                Q2 = squeeze(Q.z);
+            case 2
+                Q1 = squeeze(Q.x);
+                Q2 = squeeze(Q.z);
+            case 3
+                Q1 = squeeze(Q.x);
+                Q2 = squeeze(Q.y);
+            otherwise
+                error(sprintf('unknown knorm = %d\n',knorm));
+        end
+ 
         % interpolate values from 3D onto the 2-D mesh
         %image2d = griddata(TOMO.Xp,TOMO.Yp,TOMO.Zp,TOMO.V,Q.x,Q.y,Q.z,interpolation_method)
         mnpQx = size(Q.x)
         mnpQy = size(Q.y)
         mnpQz = size(Q.z)
-        fprintf(1,'Starting 3-D scatteredInterpolant\n');
-        extrapolation_method = 'none';
+        fprintf(1,'Starting 3-D scatteredInterpolant at t = %.001f seconds\n',toc(tstart));
+        %extrapolation_method = 'none';
+        %extrapolation_method = 'linear';
         Finterp2 = scatteredInterpolant(TOMO.Xp,TOMO.Yp,TOMO.Zp,TOMO.V ...
             ,interpolation_method,extrapolation_method);
         image2d = Finterp2(Q.x,Q.y,Q.z);
@@ -149,27 +173,14 @@ for knorm = [1,2,3]
                 error(sprintf('unknown knorm = %d\n',knorm));
         end
         
-        % remove singletons to make 2-D meshes
-        switch knorm
-            case 1
-                Q1 = squeeze(Q.y);
-                Q2 = squeeze(Q.z);
-            case 2
-                Q1 = squeeze(Q.x);
-                Q2 = squeeze(Q.z);
-            case 3
-                Q1 = squeeze(Q.x);
-                Q2 = squeeze(Q.y);
-            otherwise
-                error(sprintf('unknown knorm = %d\n',knorm));
-        end
-        
+       
         
         % interpolate onto 2-D mesh
         if numel(colvec(Q1)) > 10 && numel(colvec(Q2)) > 10
             %image2dinterp = interp2(Q1,Q2,squeeze(image2d),M1,M2);
-            fprintf(1,'Starting 2-D scatteredInterpolant\n');
-            Finterpolant = scatteredInterpolant(colvec(Q1),colvec(Q2),colvec(squeeze(image2d)));
+            fprintf(1,'Starting 2-D scatteredInterpolant at t = %.001f seconds\n',toc(tstart));
+            Finterpolant = scatteredInterpolant(colvec(Q1),colvec(Q2),colvec(squeeze(image2d))...
+            ,interpolation_method,extrapolation_method);
             %whos Finterpolant
             image2dinterp = Finterpolant(colvec(M1),colvec(M2));
             if numel(image2dinterp) == numel(M1)
@@ -185,10 +196,10 @@ for knorm = [1,2,3]
                     caxis([vmin,vmax]);
                     caxis manual;
                 else
-                    vmin = nanmin(colvec(image2dinterp));
-                    vmax = nanmax(colvec(image2dinterp));
-                    if isfinite(vmin) == 1 && isfinite(vmax)==1
-                        caxis([vmin,vmax]);
+                    vmin1 = nanmin(colvec(image2dinterp));
+                    vmax1 = nanmax(colvec(image2dinterp));
+                    if isfinite(vmin1) == 1 && isfinite(vmax1)==1
+                        caxis([vmin1,vmax1]);
                         caxis manual;
                     else
                         caxis auto;
@@ -262,6 +273,52 @@ for knorm = [1,2,3]
                 %draw_faults(S,knorm,constant_coordinate,nmin,norder,plot_points,plot_curves,ksor);
                 draw_faults2(FAULTS,knorm,constant_coordinate,nmin,norder,plot_points,plot_curves,ksor);
                 
+                % draw the wells
+                switch knorm
+                    case 1
+                        for i=1:numel(WELLS.grdsurf.Yp)
+                            if abs(WELLS.grdsurf.Xp(i)-SLICES.Xp(kslice)) < 10*rsearch
+                                plot([WELLS.grdsurf.Yp(i),WELLS.openbtm.Yp(i)]...
+                                    ,[WELLS.grdsurf.Zp(i),WELLS.openbtm.Zp(i)]...
+                                    ,'ok:','LineWidth',1);
+                            end
+                        end
+                    case 2
+                        for i=1:numel(WELLS.grdsurf.Xp)
+                            if abs(WELLS.grdsurf.Yp(i)-SLICES.Yp(kslice)) < 10*rsearch
+                                plot([WELLS.grdsurf.Xp(i),WELLS.openbtm.Xp(i)]...
+                                    ,[WELLS.grdsurf.Zp(i),WELLS.openbtm.Zp(i)]...
+                                    ,'ok:','LineWidth',1);
+                            end
+                        end
+                    case 3
+                        plot(WELLS.grdsurf.Xp,WELLS.grdsurf.Yp,'k^','MarkerSize',2,'MarkerFaceColor','k');
+                    otherwise
+                        error(sprintf('unknown knorm = %d\n',knorm));
+                end
+                
+               % draw the sample points
+                switch knorm
+                    case 1
+                        for i=1:numel(TOMO.Xp)
+                            if abs(TOMO.Xp(i)-SLICES.Xp(kslice)) < 10*rsearch
+                                plot(TOMO.Yp(i),TOMO.Zp(i),'ok','MarkerSize',7);
+                            end
+                        end
+                    case 2
+                        for i=1:numel(TOMO.Yp)
+                            if abs(TOMO.Yp(i)-SLICES.Yp(kslice)) < 10*rsearch
+                                plot(TOMO.Xp(i),TOMO.Zp(i),'ok','MarkerSize',7);
+                            end
+                        end
+                    case 3
+                        plot(TOMO.Xp,TOMO.Yp,'ok','MarkerSize',7);
+                    otherwise
+                        error(sprintf('unknown knorm = %d\n',knorm));
+                end
+                
+                
+
                 % label axes
                 switch knorm
                     case 1

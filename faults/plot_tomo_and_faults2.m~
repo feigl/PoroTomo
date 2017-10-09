@@ -97,7 +97,6 @@ for knorm = [1,2,3]
             error('miscount 3');
         end
         
-        knorm
         switch knorm
             % build 3-D plaid grid using all 3 coordinates in slicing plane
             %             case 1
@@ -125,10 +124,7 @@ for knorm = [1,2,3]
         end
         % interpolate values from 3D onto the 2-D mesh
         %image2d = griddata(TOMO.Xp,TOMO.Yp,TOMO.Zp,TOMO.V,Q.x,Q.y,Q.z,interpolation_method)
-        mnpQx = size(Q.x)
-        mnpQy = size(Q.y)
-        mnpQz = size(Q.z)
-        fprintf(1,'Starting 3-D scatteredInterpolant\n');
+        nQx = size(Q.x)
         extrapolation_method = 'none';
         Finterp2 = scatteredInterpolant(TOMO.Xp,TOMO.Yp,TOMO.Zp,TOMO.V ...
             ,interpolation_method,extrapolation_method);
@@ -168,7 +164,7 @@ for knorm = [1,2,3]
         % interpolate onto 2-D mesh
         if numel(colvec(Q1)) > 10 && numel(colvec(Q2)) > 10
             %image2dinterp = interp2(Q1,Q2,squeeze(image2d),M1,M2);
-            fprintf(1,'Starting 2-D scatteredInterpolant\n');
+            
             Finterpolant = scatteredInterpolant(colvec(Q1),colvec(Q2),colvec(squeeze(image2d)));
             %whos Finterpolant
             image2dinterp = Finterpolant(colvec(M1),colvec(M2));
