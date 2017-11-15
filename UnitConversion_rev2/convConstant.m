@@ -11,6 +11,7 @@ classdef convConstant
     %           December, 2010
     % REVISED:
     %           January 20, 2012   Correct the definition of weber
+    %           November 15, 2017 add strain Kurt Feigl 
     
     properties
         unitName       % The name of the unit
@@ -259,7 +260,8 @@ classdef convConstant
                     y=units2convFac(2*pi*unit('rad')); 
                 case {'hertz','Hz'}                          % frequency in hertz
                     y=units2convFac(unit('cycles/second'));
-                    
+                case {'strain'}                              % strain is dimensionless
+                    y=units2convFac(unit(''));               % Kurt Feigl 20171115
                 otherwise
                     error(['Unit known as "' x '" is not in the conversion table!'])
             end % switch
