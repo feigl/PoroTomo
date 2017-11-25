@@ -104,7 +104,6 @@ for knorm = [1,2,3]
             error('miscount 3');
         end
         
-        knorm
         switch knorm
             % build 3-D plaid grid using all 3 coordinates in slicing plane
             %             case 1
@@ -280,7 +279,7 @@ for knorm = [1,2,3]
                             if abs(WELLS.grdsurf.Xp(i)-SLICES.Xp(kslice)) < 10*rsearch
                                 plot([WELLS.grdsurf.Yp(i),WELLS.openbtm.Yp(i)]...
                                     ,[WELLS.grdsurf.Zp(i),WELLS.openbtm.Zp(i)]...
-                                    ,'ok:','LineWidth',1);
+                                    ,'k^:','LineWidth',1);
                             end
                         end
                     case 2
@@ -288,7 +287,7 @@ for knorm = [1,2,3]
                             if abs(WELLS.grdsurf.Yp(i)-SLICES.Yp(kslice)) < 10*rsearch
                                 plot([WELLS.grdsurf.Xp(i),WELLS.openbtm.Xp(i)]...
                                     ,[WELLS.grdsurf.Zp(i),WELLS.openbtm.Zp(i)]...
-                                    ,'ok:','LineWidth',1);
+                                    ,'k^:','LineWidth',1);
                             end
                         end
                     case 3
@@ -297,29 +296,29 @@ for knorm = [1,2,3]
                         error(sprintf('unknown knorm = %d\n',knorm));
                 end
                 
-               % draw the sample points
-                switch knorm
-                    case 1
-                        for i=1:numel(TOMO.Xp)
-                            if abs(TOMO.Xp(i)-SLICES.Xp(kslice)) < 10*rsearch
-                                plot(TOMO.Yp(i),TOMO.Zp(i),'ok','MarkerSize',7);
+                %% draw the sample points
+                if plot_points == 1
+                    switch knorm
+                        case 1
+                            for i=1:numel(TOMO.Xp)
+                                if abs(TOMO.Xp(i)-SLICES.Xp(kslice)) < 10*rsearch
+                                    plot(TOMO.Yp(i),TOMO.Zp(i),'ok','MarkerSize',7);
+                                end
                             end
-                        end
-                    case 2
-                        for i=1:numel(TOMO.Yp)
-                            if abs(TOMO.Yp(i)-SLICES.Yp(kslice)) < 10*rsearch
-                                plot(TOMO.Xp(i),TOMO.Zp(i),'ok','MarkerSize',7);
+                        case 2
+                            for i=1:numel(TOMO.Yp)
+                                if abs(TOMO.Yp(i)-SLICES.Yp(kslice)) < 10*rsearch
+                                    plot(TOMO.Xp(i),TOMO.Zp(i),'ok','MarkerSize',7);
+                                end
                             end
-                        end
-                    case 3
-                        plot(TOMO.Xp,TOMO.Yp,'ok','MarkerSize',7);
-                    otherwise
-                        error(sprintf('unknown knorm = %d\n',knorm));
+                        case 3
+                            plot(TOMO.Xp,TOMO.Yp,'ok','MarkerSize',7);
+                        otherwise
+                            error(sprintf('unknown knorm = %d\n',knorm));
+                    end
                 end
-                
-                
 
-                % label axes
+                %% label axes
                 switch knorm
                     case 1
                         % slicing plane is normal to X axis
