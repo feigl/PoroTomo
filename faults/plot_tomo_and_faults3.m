@@ -1,6 +1,7 @@
-function figfilenames = plot_tomo_and_faults3(TOMO,FAULTS,title_str,SLICES,OPTIONS,funprint,rsearch, WELLS)
+function figfilenames = plot_tomo_and_faults3(TOMO,FAULTS,title_str,SLICES,OPTIONS,funprint,rsearch, WELLS, elev_mean,BRADY2GRID)
 % make slices at SLICES of tomogram TOMO with faults in FAULTS
 % 20170921 Kurt Feigl
+% 20171203 Kurt Feigl - include topographic surface and depth
 
 % initialize
 kfiles = 0;
@@ -332,12 +333,43 @@ for knorm = [1,2,3]
                         ylabel('Z_{PoroTomo} [m]'); % (= elevation above WGS84 ellipsoid + 800 m'
                     case 3
                         % slicing plane is normal to Z axis
-                        title(sprintf('Z_{PoroTomo} = %10.1f meters (%s)',constant_coordinate,strrep(title_str,'_',' ')));
+                        %title(sprintf('Z_{PoroTomo} = %10.1f meters (%s)',constant_coordinate,strrep(title_str,'_',' ')));
+                        % label with depth
+                        title(sprintf('Z_{PoroTomo} = %7.0f m; depth = %7.0f m; (%s)'...
+                            ,constant_coordinate,elev_mean-constant_coordinate-800,strrep(title_str,'_',' ')));
                         xlabel('<-- NW       X_{PoroTomo} [m]        SE -->');
                         ylabel('<-- SW       Y_{PoroTomo} [m]        NE -->');
                     otherwise
                         error(sprintf('unknown knorm %d\n',knorm));
                 end
+                
+                %% depth on second axis on right
+                switch knorm
+                    case 1
+                        %axis([nanmin(SLICES.Yp), nanmax(SLICES.Yp), nanmin(SLICES.Zp), nanmax(SLICES.Zp)]);
+                        %                         y2 = elev_mean - y1 - 800;
+                        yyaxis right
+                        axis ij
+                        plot([nanmin(SLICES.Yp), nanmax(SLICES.Yp)],elev_mean-[nanmin(SLICES.Zp), nanmax(SLICES.Zp)]-800,'w.');
+                        ylabel('Depth [m]','color','k');
+                        ax = gca;
+                        ax.YAxis(1).Color='k';
+                        ax.YAxis(2).Color='k';
+                    case 2
+                        %%axis([nanmin(SLICES.Xp), nanmax(SLICES.Xp), nanmin(SLICES.Zp), nanmax(SLICES.Zp)]);
+                        yyaxis right
+                        axis ij
+                        plot([nanmin(SLICES.Xp), nanmax(SLICES.Xp)],elev_mean-[nanmin(SLICES.Zp), nanmax(SLICES.Zp)]-800,'w.');
+                        ylabel('Depth [m]','color','k');
+                        ax = gca;
+                        ax.YAxis(1).Color='k';
+                        ax.YAxis(2).Color='k';
+                    case 3
+                        %axis([nanmin(SLICES.Xp), nanmax(SLICES.Xp), nanmin(SLICES.Yp), nanmax(SLICES.Yp)]);
+                    otherwise
+                        error(sprintf('unknown knorm = %d\n',knorm));
+                end
+
                 
                 %% set the axes to be the same size as the tomogram
                 %       hold on;
