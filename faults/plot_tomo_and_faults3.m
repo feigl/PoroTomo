@@ -186,9 +186,6 @@ for knorm = [1,2,3]
             if numel(image2dinterp) == numel(M1)
                 image2dinterp = reshape(image2dinterp,size(M1));
                 
-                % plot the tomogram
-                figure;
-                hold on;
                 
                 % setting the velocity range for plotting
                 %caxis([v1, v2]);
