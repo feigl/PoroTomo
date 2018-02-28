@@ -1,7 +1,27 @@
-function figfilenames = plot_tomo_and_faults3(TOMO,FAULTS,title_str,SLICES,OPTIONS,funprint,rsearch, WELLS, elev_mean,BRADY2GRID)
+function figfilenames = plot_tomo_and_faults4(TOMO,FAULTS,title_str,SLICES,OPTIONS,funprint,rsearch, WELLS, elev_mean,BRADY2GRID)
 % make slices at SLICES of tomogram TOMO with faults in FAULTS
 % 20170921 Kurt Feigl
 % 20171203 Kurt Feigl - include topographic surface and depth
+% 20180211 Kurt Feigl for GRL
+% Begin forwarded message:
+% 
+% From: Clifford Thurber <cthurber@wisc.edu>
+% Subject: Re: Figures for SRL paper
+% Date: February 10, 2018 at 10:26:32 AM CST
+% To: Kurt Feigl <feigl@wisc.edu>
+% Cc: Lesley Parker <lparker4@wisc.edu>
+% 
+% If you can re-make them as eps and they aren?t awful like the pdfs, please also simplify the labeling:
+% 
+% No plot title showing PoroTomo coordinate info
+% No NE/SW/NW/SE labels
+% No PoroTomo subscript on axis labels
+% No depth on right axis of cross-sections
+% 
+% Also, please no triangle at the bottom of wells on cross-sections
+% 
+% I am going to use WGS84 for elevation for this paper, not PoroTomo Z, because I do not want to confuse SRL readers, so please add 800 to the Z values in the cross-sections.
+
 
 % initialize
 kfiles = 0;
@@ -62,11 +82,6 @@ if exist('OPTIONS','var') == 1
     else
         extrapolation_method = 'linear';
     end
-    if isfield(OPTIONS,'padding') == 1
-        padding=OPTIONS.padding;
-    else
-        padding = 100; % padding [m] to avoid edge effects in interpolation
-    end
 end
 
 
@@ -90,22 +105,20 @@ for knorm = [1,2,3]
             error(sprintf('unknown knorm = %d\n',knorm));
     end
     %% loop over slices
-    
     for kslice = 1:nslices
-        % select sample points in bounds +/- 500 meters
-       
+        % select sample points in bounds
         ikeep = 1:numel(TOMO.Xp);
         if knorm ~= 1
-            ikeep = intersect(ikeep,find(TOMO.Xp <= nanmax(colvec(SLICES.Xp))+padding));
-            ikeep = intersect(ikeep,find(TOMO.Xp >= nanmin(colvec(SLICES.Xp))-padding));
+            ikeep = intersect(ikeep,find(TOMO.Xp <= nanmax(colvec(SLICES.Xp))));
+            ikeep = intersect(ikeep,find(TOMO.Xp >= nanmin(colvec(SLICES.Xp))));
         end
         if knorm ~= 2
-            ikeep = intersect(ikeep,find(TOMO.Yp <= nanmax(colvec(SLICES.Yp))+padding));
-            ikeep = intersect(ikeep,find(TOMO.Yp >= nanmin(colvec(SLICES.Yp))-padding));
+            ikeep = intersect(ikeep,find(TOMO.Yp <= nanmax(colvec(SLICES.Yp))));
+            ikeep = intersect(ikeep,find(TOMO.Yp >= nanmin(colvec(SLICES.Yp))));
         end
         if knorm ~= 3
-            ikeep = intersect(ikeep,find(TOMO.Zp <= nanmax(colvec(SLICES.Zp))+20)); % hard wired to avoid floating
-            ikeep = intersect(ikeep,find(TOMO.Zp >= nanmin(colvec(SLICES.Zp))-padding));
+            ikeep = intersect(ikeep,find(TOMO.Zp <= nanmax(colvec(SLICES.Zp))));
+            ikeep = intersect(ikeep,find(TOMO.Zp >= nanmin(colvec(SLICES.Zp))));
         end
         if numel(ikeep) < 10
             numel(ikeep)
@@ -193,6 +206,9 @@ for knorm = [1,2,3]
             if numel(image2dinterp) == numel(M1)
                 image2dinterp = reshape(image2dinterp,size(M1));
                 
+                % plot the tomogram
+                figure;
+                hold on;
                 
                 % setting the velocity range for plotting
                 %caxis([v1, v2]);
@@ -277,29 +293,29 @@ for knorm = [1,2,3]
                 %draw_faults(S,knorm,constant_coordinate,nmin,norder,plot_points,plot_curves,ksor);
                 draw_faults2(FAULTS,knorm,constant_coordinate,nmin,norder,plot_points,plot_curves,ksor);
                 
-                % draw the wells
-                switch knorm
-                    case 1
-                        for i=1:numel(WELLS.grdsurf.Yp)
-                            if abs(WELLS.grdsurf.Xp(i)-SLICES.Xp(kslice)) < 10*rsearch
-                                plot([WELLS.grdsurf.Yp(i),WELLS.openbtm.Yp(i)]...
-                                    ,[WELLS.grdsurf.Zp(i),WELLS.openbtm.Zp(i)]...
-                                    ,'k^:','LineWidth',1);
-                            end
-                        end
-                    case 2
-                        for i=1:numel(WELLS.grdsurf.Xp)
-                            if abs(WELLS.grdsurf.Yp(i)-SLICES.Yp(kslice)) < 10*rsearch
-                                plot([WELLS.grdsurf.Xp(i),WELLS.openbtm.Xp(i)]...
-                                    ,[WELLS.grdsurf.Zp(i),WELLS.openbtm.Zp(i)]...
-                                    ,'k^:','LineWidth',1);
-                            end
-                        end
-                    case 3
-                        plot(WELLS.grdsurf.Xp,WELLS.grdsurf.Yp,'k^','MarkerSize',2,'MarkerFaceColor','k');
-                    otherwise
-                        error(sprintf('unknown knorm = %d\n',knorm));
-                end
+%                 % draw the wells
+%                 switch knorm
+%                     case 1
+%                         for i=1:numel(WELLS.grdsurf.Yp)
+%                             if abs(WELLS.grdsurf.Xp(i)-SLICES.Xp(kslice)) < 10*rsearch
+%                                 plot([WELLS.grdsurf.Yp(i),WELLS.openbtm.Yp(i)]...
+%                                     ,[WELLS.grdsurf.Zp(i),WELLS.openbtm.Zp(i)]...
+%                                     ,'k^:','LineWidth',1);
+%                             end
+%                         end
+%                     case 2
+%                         for i=1:numel(WELLS.grdsurf.Xp)
+%                             if abs(WELLS.grdsurf.Yp(i)-SLICES.Yp(kslice)) < 10*rsearch
+%                                 plot([WELLS.grdsurf.Xp(i),WELLS.openbtm.Xp(i)]...
+%                                     ,[WELLS.grdsurf.Zp(i),WELLS.openbtm.Zp(i)]...
+%                                     ,'k^:','LineWidth',1);
+%                             end
+%                         end
+%                     case 3
+%                         plot(WELLS.grdsurf.Xp,WELLS.grdsurf.Yp,'k^','MarkerSize',2,'MarkerFaceColor','k');
+%                     otherwise
+%                         error(sprintf('unknown knorm = %d\n',knorm));
+%                 end
                 
                 %% draw the sample points
                 if plot_points == 1
@@ -327,44 +343,74 @@ for knorm = [1,2,3]
                 switch knorm
                     case 1
                         % slicing plane is normal to X axis
-                        title(sprintf('X_{PoroTomo} = %10.1f meters (%s)',constant_coordinate,strrep(title_str,'_',' ')));
-                        xlabel('<-- SW       Y_{PoroTomo} [m]        NE -->');
-                        ylabel('Z_{PoroTomo} [m]'); % (= elevation above WGS84 ellipsoid + 800 m'
+%                        title(sprintf('X_{PoroTomo} = %10.1f meters (%s)',constant_coordinate,strrep(title_str,'_',' ')));
+%                         xlabel('<-- SW       Y_{PoroTomo} [m]        NE -->');
+%                         ylabel('Z_{PoroTomo} [m]'); % (= elevation above WGS84 ellipsoid + 800 m'
+                        xlabel('Y [m]');
+                        ylabel('Z [m]'); % (= elevation above WGS84 ellipsoid - 800 m'
                     case 2
                         % slicing plane is normal to Y axis
-                        title(sprintf('Y_{PoroTomo} = %10.1f meters (%s)',constant_coordinate,strrep(title_str,'_',' ')));
-                        xlabel('<-- NW       X_{PoroTomo} [m]        SE -->');
-                        ylabel('Z_{PoroTomo} [m]'); % (= elevation above WGS84 ellipsoid + 800 m'
+ %                       title(sprintf('Y_{PoroTomo} = %10.1f meters (%s)',constant_coordinate,strrep(title_str,'_',' ')));
+%                         xlabel('X_{PoroTomo} [m]        SE -->');
+%                         ylabel('Z_{PoroTomo} [m]'); % (= elevation above WGS84 ellipsoid - 800 m'
+                        xlabel('X [m]');
+                        ylabel('Z [m]'); % (= elevation above WGS84 ellipsoid - 800 m'
                     case 3
                         % slicing plane is normal to Z axis
                         %title(sprintf('Z_{PoroTomo} = %10.1f meters (%s)',constant_coordinate,strrep(title_str,'_',' ')));
                         % label with depth
-                        title(sprintf('Z_{PoroTomo} = %7.0f m; depth = %7.0f m; (%s)'...
-                            ,constant_coordinate,elev_mean-constant_coordinate-800,strrep(title_str,'_',' ')));
-                        xlabel('<-- NW       X_{PoroTomo} [m]        SE -->');
-                        ylabel('<-- SW       Y_{PoroTomo} [m]        NE -->');
+ %                       title(sprintf('Z_{PoroTomo} = %7.0f m; depth = %7.0f m; (%s)'...
+ %                           ,constant_coordinate,elev_mean-constant_coordinate-800,strrep(title_str,'_',' ')));
+%                         xlabel('<-- NW       X_{PoroTomo} [m]        SE -->');
+%                         ylabel('<-- SW       Y_{PoroTomo} [m]        NE -->');
+                       xlabel('X [m]');
+                       ylabel('Y [m]');
                     otherwise
                         error(sprintf('unknown knorm %d\n',knorm));
                 end
                 
                 %% depth on second axis on right
+%                 switch knorm
+%                     case 1
+%                         %axis([nanmin(SLICES.Yp), nanmax(SLICES.Yp), nanmin(SLICES.Zp), nanmax(SLICES.Zp)]);
+%                         %                         y2 = elev_mean - y1 - 800;
+%                         yyaxis right
+%                         axis ij
+%                         plot([nanmin(SLICES.Yp), nanmax(SLICES.Yp)],elev_mean-[nanmin(SLICES.Zp), nanmax(SLICES.Zp)]-800,'w.');
+%                         ylabel('Depth [m]','color','k');
+%                         ax = gca;
+%                         ax.YAxis(1).Color='k';
+%                         ax.YAxis(2).Color='k';
+%                     case 2
+%                         %%axis([nanmin(SLICES.Xp), nanmax(SLICES.Xp), nanmin(SLICES.Zp), nanmax(SLICES.Zp)]);
+%                         yyaxis right
+%                         axis ij
+%                         plot([nanmin(SLICES.Xp), nanmax(SLICES.Xp)],elev_mean-[nanmin(SLICES.Zp), nanmax(SLICES.Zp)]-800,'w.');
+%                         ylabel('Depth [m]','color','k');
+%                         ax = gca;
+%                         ax.YAxis(1).Color='k';
+%                         ax.YAxis(2).Color='k';
+%                     case 3
+%                         %axis([nanmin(SLICES.Xp), nanmax(SLICES.Xp), nanmin(SLICES.Yp), nanmax(SLICES.Yp)]);
+%                     otherwise
+%                         error(sprintf('unknown knorm = %d\n',knorm));
+%                 end
+
+                %% WGS elevation second axis on right
                 switch knorm
                     case 1
-                        %axis([nanmin(SLICES.Yp), nanmax(SLICES.Yp), nanmin(SLICES.Zp), nanmax(SLICES.Zp)]);
-                        %                         y2 = elev_mean - y1 - 800;
                         yyaxis right
-                        axis ij
-                        plot([nanmin(SLICES.Yp), nanmax(SLICES.Yp)],elev_mean-[nanmin(SLICES.Zp), nanmax(SLICES.Zp)]-800,'w.');
-                        ylabel('Depth [m]','color','k');
+                        axis xy
+                        plot([nanmin(SLICES.Yp), nanmax(SLICES.Yp)],[nanmin(SLICES.Zp)+800, nanmax(SLICES.Zp)+800],'w.');
+                        ylabel('Elevation [m]','color','k');
                         ax = gca;
                         ax.YAxis(1).Color='k';
                         ax.YAxis(2).Color='k';
                     case 2
-                        %%axis([nanmin(SLICES.Xp), nanmax(SLICES.Xp), nanmin(SLICES.Zp), nanmax(SLICES.Zp)]);
                         yyaxis right
-                        axis ij
-                        plot([nanmin(SLICES.Xp), nanmax(SLICES.Xp)],elev_mean-[nanmin(SLICES.Zp), nanmax(SLICES.Zp)]-800,'w.');
-                        ylabel('Depth [m]','color','k');
+                        axis xy
+                        plot([nanmin(SLICES.Xp), nanmax(SLICES.Xp)],[nanmin(SLICES.Zp)+800, nanmax(SLICES.Zp)+800],'w.');
+                        ylabel('Elevation [m]','color','k');
                         ax = gca;
                         ax.YAxis(1).Color='k';
                         ax.YAxis(2).Color='k';
@@ -373,6 +419,7 @@ for knorm = [1,2,3]
                     otherwise
                         error(sprintf('unknown knorm = %d\n',knorm));
                 end
+
 
                 
                 %% set the axes to be the same size as the tomogram
