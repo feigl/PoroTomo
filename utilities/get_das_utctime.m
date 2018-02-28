@@ -1,10 +1,11 @@
-function t0=get_das_utctime0(textual_header)
+function t0=get_das_utctime(textual_header)
 %this version is show UTC time
 %for silixa ... 
 %requirements: SegyMat. 
 % 20160325 original Zeng Xiang-Fang UW-Madison
 % 20160328 adapted and documented by Kurt Feigl and Chelsea Lancelle
 % 20160509 Kurt Feigl with comments from Neal Lord
+% 20180220 Kurt Feigl make less verbose
 
 %segyf
 %[data,trd,hd]=ReadSegy(segyf);
@@ -16,9 +17,9 @@ function t0=get_das_utctime0(textual_header)
 atext = char(ebcdic2ascii(textual_header));
 
 %% split into lines of 80 characters each
-for i=1:ceil(numel(atext)/80);
+for i=1:ceil(numel(atext)/80)
     atextrows{i} = atext([((i-1)*80+1):(i-1)*80+80]);
-    fprintf(1,'%80s\n',char(atextrows{i}));
+    %fprintf(1,'%80s\n',char(atextrows{i}));
 end
 
 
@@ -87,7 +88,7 @@ end
 %  
 % Fortunately they haven?t made a versions incompatible with the other versions.
 
-atextrow09 = char(atextrows{9})
+atextrow09 = char(atextrows{9});
 
 if numel(strfind(atextrow09,'GPSTimeStamp:')) > 0
     itype = 1;
@@ -97,10 +98,10 @@ elseif numel(strfind(atextrow09,'GPS Time stamp:')) > 0
     itype = 3;
 elseif numel(strfind(atextrow09,'UTC Timestamp of first sample: ')) > 0
     itype = 4;
-    ii = strfind(atextrow09,': ')
-    timestamp = atextrow09(ii+2:ii+33)
-    day = str2num(timestamp(1:2))
-    monthstr = timestamp(4:6)
+    ii = strfind(atextrow09,': ');
+    timestamp = atextrow09(ii+2:ii+33);
+    day = str2num(timestamp(1:2));
+    monthstr = timestamp(4:6);
     switch monthstr
         case 'Jan'
             month = 1;
@@ -131,11 +132,11 @@ elseif numel(strfind(atextrow09,'UTC Timestamp of first sample: ')) > 0
             month = 0;
     end
             
-    year         = str2num(timestamp(8:11))  
-    hour         = str2num(timestamp(13:14))  
-    minute       = str2num(timestamp(16:17))  
-    seconds      = str2num(timestamp(19:20))
-    milliseconds = str2num(timestamp(21:32))*1.e3
+    year         = str2num(timestamp(8:11)); 
+    hour         = str2num(timestamp(13:14)); 
+    minute       = str2num(timestamp(16:17));  
+    seconds      = str2num(timestamp(19:20));
+    milliseconds = str2num(timestamp(21:32))*1.e3;
 else
     itype = 0;
     timestamp = 'Unknown time stamp format'
@@ -156,8 +157,6 @@ end
 t0 = datetime(year,month,day,hour,minute,seconds,milliseconds...
     ,'TimeZone','UTC');
 t0.Format='yyyy/MM/dd_HH:mm:ss.SSSSSSSSSS';
-% t0.TimeZone = 'UTC';
-t0
 
 
 % % add time increment
