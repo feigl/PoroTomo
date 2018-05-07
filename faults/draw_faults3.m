@@ -1,4 +1,4 @@
-function draw_faults(S,knorm,constant_coordinate1,nmin,norder,plot_points,plot_curves,ksor)
+function draw_faults3(S,knorm,constant_coordinate1,nmin,norder,plot_points,plot_curves,ksor)
 % draw faults on planar slices
 % input:
 % S == structure containing fault coordinates

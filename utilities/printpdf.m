@@ -5,6 +5,8 @@ if nargin < 1
     pdffilename = mfilename;
 end
 
+% escape spaces
+pdffilename=strrep(pdffilename,' ','\ ');
 if numel(strfind(pdffilename,'.pdf')) <= 0
     pdffilename = sprintf('%s.pdf',pdffilename);
 end
@@ -13,6 +15,7 @@ end
 t0=pwd;
 %t1=strrep(pdffilename,'_','\_');
 t1=pdffilename;
+
 %t2=date;
 t2 = datestr(now,31); %31             'yyyy-mm-dd HH:MM:SS'    2000-03-01 15:45:17 
 tu=getenv('USER');
@@ -84,7 +87,8 @@ text(0,0,t3...
 if exist('ghandle','var') == 1
     print(ghandle,pdffilename,'-dpdf','-r1200'); % otherwise, print PDF
 else
-    print(gcf,pdffilename,'-dpdf','-r1200'); % otherwise, print PDF
+    %print(gcf,pdffilename,'-dpdf','-r1200'); % otherwise, print PDF
+    print(pdffilename,'-dpdf','-r1200'); % otherwise, print PDF
 end
 
 return

@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 function figfilenames = plot_tomo_and_faults5(TOMO,FAULTS,title_str,BOUNDS,OPTIONS,funprint...
     ,rsearch, WELLS, elev_mean, BRADY2DGRID, SLICES)
+=======
+function figfilenames = plot_tomo_and_faults5(TOMO,FAULTS,title_str,BOUNDS,OPTIONS,funprint,rsearch, WELLS, elev_mean,BRADY2GRID, SLICES,geologic_model)
+>>>>>>> ac25af2223c5b61d0db0553384d5bea3cd1ed1b6
 % make slices at BOUNDS of tomogram TOMO with faults in FAULTS
 % 20170921 Kurt Feigl
 % 20171203 Kurt Feigl - include topographic surface and depth
@@ -95,13 +99,14 @@ if exist('OPTIONS','var') == 1
     if isfield(OPTIONS,'short_labels') == 1
         short_labels=OPTIONS.short_labels;
     else
-        short_labels = 1;
+        short_labels = 0;
     end
     if isfield(OPTIONS,'flattened_cube') == 1
         flattened_cube=OPTIONS.flattened_cube;
     else
         flattened_cube = 0;
     end
+<<<<<<< HEAD
     if isfield(OPTIONS,'resolution_threshold') == 1
         resolution_threshold=OPTIONS.resolution_threshold;
     else
@@ -116,6 +121,12 @@ if exist('OPTIONS','var') == 1
         draw_topo=OPTIONS.draw_topo;
     else
         draw_topo = '';
+=======
+    if isfield(OPTIONS,'contours') == 1
+        contours=OPTIONS.contours;
+    else
+        contours = 0;
+>>>>>>> ac25af2223c5b61d0db0553384d5bea3cd1ed1b6
     end
 end
 
@@ -156,16 +167,16 @@ for knorm = [1,2,3]
         % select sample points in bounds
         ikeep = 1:numel(TOMO.Xp);
         if knorm ~= 1
-            ikeep = intersect(ikeep,find(TOMO.Xp <= nanmax(colvec(BOUNDS.Xp))));
-            ikeep = intersect(ikeep,find(TOMO.Xp >= nanmin(colvec(BOUNDS.Xp))));
+            ikeep = intersect(ikeep,find(TOMO.Xp <= nanmax(colvec(BOUNDS.Xp)) + rsearch));
+            ikeep = intersect(ikeep,find(TOMO.Xp >= nanmin(colvec(BOUNDS.Xp)) - rsearch));
         end
         if knorm ~= 2
-            ikeep = intersect(ikeep,find(TOMO.Yp <= nanmax(colvec(BOUNDS.Yp))));
-            ikeep = intersect(ikeep,find(TOMO.Yp >= nanmin(colvec(BOUNDS.Yp))));
+            ikeep = intersect(ikeep,find(TOMO.Yp <= nanmax(colvec(BOUNDS.Yp)) + rsearch));
+            ikeep = intersect(ikeep,find(TOMO.Yp >= nanmin(colvec(BOUNDS.Yp)) - rsearch));
         end
         if knorm ~= 3
-            ikeep = intersect(ikeep,find(TOMO.Zp <= nanmax(colvec(BOUNDS.Zp))));
-            ikeep = intersect(ikeep,find(TOMO.Zp >= nanmin(colvec(BOUNDS.Zp))));
+            ikeep = intersect(ikeep,find(TOMO.Zp <= nanmax(colvec(BOUNDS.Zp)) + rsearch));
+            ikeep = intersect(ikeep,find(TOMO.Zp >= nanmin(colvec(BOUNDS.Zp)) - rsearch));
         end
         if numel(ikeep) < 10
             numel(ikeep)
@@ -218,13 +229,19 @@ for knorm = [1,2,3]
         mnpQx = size(Q.x)
         mnpQy = size(Q.y)
         mnpQz = size(Q.z)
+        mnV   = size(TOMO.V)
         fprintf(1,'Starting 3-D scatteredInterpolant at t = %.001f seconds\n',toc(tstart));
         %extrapolation_method = 'none';
         %extrapolation_method = 'linear';
+<<<<<<< HEAD
         TOMO
         interpolation_method
         extrapolation_method
         numel(TOMO.V(isfinite(TOMO.V)))
+=======
+        interpolation_method
+        extrapolation_method
+>>>>>>> ac25af2223c5b61d0db0553384d5bea3cd1ed1b6
         Finterp2 = scatteredInterpolant(TOMO.Xp,TOMO.Yp,TOMO.Zp,TOMO.V ...
             ,interpolation_method,extrapolation_method);
         image2d = Finterp2(Q.x,Q.y,Q.z);
@@ -287,10 +304,10 @@ for knorm = [1,2,3]
                     caxis([vmin,vmax]);
                     caxis manual;
                 else
-                    vmin1 = nanmin(colvec(image2dinterp));
-                    vmax1 = nanmax(colvec(image2dinterp));
-                    if isfinite(vmin1) == 1 && isfinite(vmax1)==1
-                        caxis([vmin1,vmax1]);
+                    vmin = nanmin(colvec(image2dinterp));
+                    vmax = nanmax(colvec(image2dinterp));
+                    if isfinite(vmin) == 1 && isfinite(vmax)==1
+                        caxis([vmin,vmax]);
                         caxis manual;
                     else
                         caxis auto;
@@ -322,33 +339,24 @@ for knorm = [1,2,3]
                         axis([nanmin(BOUNDS.Xp), nanmax(BOUNDS.Xp), nanmin(BOUNDS.Yp), nanmax(BOUNDS.Yp)]);
                     otherwise
                         error(sprintf('unknown knorm = %d\n',knorm));
-                end
-                %             % same size as the tomogram
-                %             switch knorm
-                %                 case 1
-                %                     axis([nanmin(TOMO.Yp), nanmax(TOMO.Yp), nanmin(TOMO.Zp), nanmax(TOMO.Zp)]);
-                %                 case 2
-                %                     axis([nanmin(TOMO.Xp), nanmax(TOMO.Xp), nanmin(TOMO.Zp), nanmax(TOMO.Zp)]);
-                %                 case 3
-                %                     axis([nanmin(TOMO.Xp), nanmax(TOMO.Xp), nanmin(TOMO.Yp), nanmax(TOMO.Yp)]);
-                %                 otherwise
-                %                     error(sprintf('unknown knorm = %d\n',knorm));
-                %             end
-                
+                end               
                 % clip outside the axes
                 ax = gca;
                 ax.Clipping='On';
+                              
+                
+                %% draw contours
+                if contours == 1
+                    %v_contours = linspace(vmin,vmax,3);
+                    v_contours = nice_steps([vmin,vmax],5);
+                    [c,h]=contour(M1,M2,image2dinterp,v_contours,'w');
+                    if short_labels == 0
+                       clabel(c,h,'LabelSpacing',8*72,'Color','White'); % spacing in points
+                    %[c,h]=contour(M1,M2,image2dinterp,v_contours,'w','ShowText','on');
+                    end
+                end
                 
                 
-                
-                % draw contours
-                %[c,h]=contour(M1,M2,image2dinterp,[v1:dv:v2],'w');
-                
-                %         S == structure containing fault coordinates
-                %         nmin =5; % minimum number of intersecting points to qualify a fault for plot
-                %         norder = 2;  % order of polynomial fit (norder = 1 is linear)
-                %         plot_points = 1; % plot intersections as black dots
-                %         plot_curves = 1; % plot polynomial as black lines
                 switch knorm
                     case 1
                         constant_coordinate = SLICES.Xp(kslice);
@@ -359,12 +367,9 @@ for knorm = [1,2,3]
                     otherwise
                         error(sprintf('unknown knorm = %d\n',knorm));
                 end
-                
-                % sort according to Y coordinate
-                ksor  = 2;
-                
-                % draw the faults
-                %draw_faults(S,knorm,constant_coordinate,nmin,norder,plot_points,plot_curves,ksor);
+                            
+                %% draw the faults              
+                ksor  = 2; % sort according to Y coordinate
                 draw_faults2(FAULTS,knorm,constant_coordinate,nmin,norder,plot_points,plot_curves,ksor);
                 
                 
@@ -393,25 +398,54 @@ for knorm = [1,2,3]
                 
                 %% draw the wells
                 if draw_wells == 1
+                    nwells = numel(WELLS.WellName);
+                    well_symbols = cell(nwells,1);
+                    for i=1:nwells
+                        if contains(WELLS.ActivityDuringPoroTomoTesting(i),'Inj') == 1
+                            well_symbols{i} = 'kv';  % downward pointing triangle for injection well
+                        elseif contains(WELLS.ActivityDuringPoroTomoTesting(i),'Pumping') == 1
+                            well_symbols{i} = 'k^';  % upward pointing triangle for injection well
+                        elseif contains(WELLS.ActivityDuringPoroTomoTesting(i),'Obs') == 1
+                            well_symbols{i} = 'ko';  % open circle for observation well
+                        else
+                            well_symbols{i} = 'k+';  % 
+                        end
+                    end
                     switch knorm
                         case 1
-                            for i=1:numel(WELLS.grdsurf.Yp)
-                                if abs(WELLS.grdsurf.Xp(i)-SLICES.Xp(kslice)) < 10*rsearch
+                            for i=1:nwells
+                                if abs(WELLS.grdsurf.Xp(i)-SLICES.Xp(kslice)) < rsearch/2.
+                                    plot(WELLS.grdsurf.Yp(i),WELLS.grdsurf.Zp(i),well_symbols{i},'MarkerSize',7,'MarkerFaceColor','none'); % symbol
                                     plot([WELLS.grdsurf.Yp(i),WELLS.openbtm.Yp(i)]...
-                                        ,[WELLS.grdsurf.Zp(i),WELLS.openbtm.Zp(i)]...
-                                        ,'k^:','LineWidth',1);
+                                        ,[WELLS.grdsurf.Zp(i),min([WELLS.openbtm.Zp(i),WELLS.perfbtm.Zp(i)])]...
+                                        ,'k-','LineWidth',1); % thin, solid line for borehole    
+                                    plot([WELLS.perftop.Yp(i),WELLS.perfbtm.Yp(i)]...
+                                        ,[WELLS.perftop.Zp(i),WELLS.perfbtm.Zp(i)]...
+                                        ,'k:','LineWidth',2); % thin, solid line for borehole 
+                                    plot([WELLS.opentop.Yp(i),WELLS.openbtm.Yp(i)]...
+                                        ,[WELLS.opentop.Zp(i),WELLS.openbtm.Zp(i)]...
+                                        ,'k:','LineWidth',4); % thick dashed line for open interval
                                 end
                             end
                         case 2
-                            for i=1:numel(WELLS.grdsurf.Xp)
-                                if abs(WELLS.grdsurf.Yp(i)-SLICES.Yp(kslice)) < 10*rsearch
+                            for i=1:nwells
+                                if abs(WELLS.grdsurf.Yp(i)-SLICES.Yp(kslice)) < rsearch/2.
+                                    plot(WELLS.grdsurf.Xp(i),WELLS.grdsurf.Zp(i),well_symbols{i},'MarkerSize',7,'MarkerFaceColor','none'); % symbol
                                     plot([WELLS.grdsurf.Xp(i),WELLS.openbtm.Xp(i)]...
-                                        ,[WELLS.grdsurf.Zp(i),WELLS.openbtm.Zp(i)]...
-                                        ,'k^:','LineWidth',1);
+                                        ,[WELLS.grdsurf.Zp(i),min([WELLS.openbtm.Zp(i),WELLS.perfbtm.Zp(i)])]...
+                                        ,'k-','LineWidth',1); % thin, solid line for borehole                                    
+                                    plot([WELLS.perftop.Xp(i),WELLS.perfbtm.Xp(i)]...
+                                        ,[WELLS.perftop.Zp(i),WELLS.perfbtm.Zp(i)]...
+                                        ,'k:','LineWidth',2); % thin, dashed line for perforated interval
+                                    plot([WELLS.opentop.Xp(i),WELLS.openbtm.Xp(i)]...
+                                        ,[WELLS.opentop.Zp(i),WELLS.openbtm.Zp(i)]...
+                                        ,'k:','LineWidth',4); % thick dashed line for open interval
                                 end
                             end
                         case 3
-                            plot(WELLS.grdsurf.Xp,WELLS.grdsurf.Yp,'k^','MarkerSize',2,'MarkerFaceColor','k');
+                            for i=1:nwells
+                                plot(WELLS.grdsurf.Xp(i),WELLS.grdsurf.Yp(i),well_symbols{i},'MarkerSize',5,'MarkerFaceColor','none');
+                            end
                         otherwise
                             error(sprintf('unknown knorm = %d\n',knorm));
                     end
@@ -441,6 +475,7 @@ for knorm = [1,2,3]
                 
                 %% title
                 if flattened_cube ~= 1
+<<<<<<< HEAD
                     switch knorm
                         case 1
                             title(sprintf('%s\nX_{PoroTomo} = %10.1f meters'...
@@ -456,6 +491,36 @@ for knorm = [1,2,3]
                                 ,constant_coordinate,elev_mean-constant_coordinate-800));
                         otherwise
                             error(sprintf('unknown knorm %d\n',knorm));
+=======
+                    if short_labels == 1
+                        switch knorm
+                            case 1
+                                title(sprintf('X = %10.1f m',constant_coordinate));
+                            case 2
+                                title(sprintf('Y = %10.1f m',constant_coordinate));                                              
+                                ax = gca;ax.Clipping='Off';
+                                text(nanmin(BOUNDS.Xp),nanmax(BOUNDS.Zp),'SW','HorizontalAlignment','left','VerticalAlignment','Bottom');
+                                text(nanmax(BOUNDS.Xp),nanmax(BOUNDS.Zp),'NE','HorizontalAlignment','right','VerticalAlignment','Bottom');
+                                ax = gca;ax.Clipping='On';
+                            case 3
+                                title(sprintf('Z = %7.0f m',constant_coordinate+800));
+                            otherwise
+                                error(sprintf('unknown knorm %d\n',knorm));
+                        end
+                    else
+                        switch knorm
+                            case 1
+                                title(sprintf('%s\nX_{PoroTomo} = %10.1f meters',strrep(title_str,'_',' '),constant_coordinate));
+                            case 2
+                                title(sprintf('%s\nY_{PoroTomo} = %10.1f meters',strrep(title_str,'_',' '),constant_coordinate));
+                            case 3
+                                title(sprintf('%s\nZ_{PoroTomo} = %7.0f m; depth = %7.0f m'...
+                                    ,strrep(title_str,'_',' ') ...
+                                    ,constant_coordinate,elev_mean-constant_coordinate-800));
+                            otherwise
+                                error(sprintf('unknown knorm %d\n',knorm));
+                        end
+>>>>>>> ac25af2223c5b61d0db0553384d5bea3cd1ed1b6
                     end
                 end
                 
@@ -464,7 +529,8 @@ for knorm = [1,2,3]
                     case 1 % slicing plane is normal to X axis
                         if short_labels == 1
                             xlabel('Y [m]');
-                            ylabel('Z [m]'); % (= elevation above WGS84 ellipsoid - 800 m'
+                            %ylabel('Z [m]'); % (= elevation above WGS84 ellipsoid - 800 m'
+                            set(gca,'YTickLabel','');
                         else
                             xlabel('<-- SW       Y_{PoroTomo} [m]        NE -->');
                             ylabel('Z_{PoroTomo} [m]'); % (= elevation above WGS84 ellipsoid + 800 m'
@@ -472,10 +538,10 @@ for knorm = [1,2,3]
                     case 2 % slicing plane is normal to Y axis
                         if short_labels == 1
                             xlabel('X [m]');
-                            ylabel('Z [m]'); % (= elevation above WGS84 ellipsoid - 800 m'
+                            %ylabel('Z [m]'); % (= elevation above WGS84 ellipsoid - 800 m'
+                            set(gca,'YTickLabel','');
                         else
-                            
-                            xlabel('X_{PoroTomo} [m]        SE -->');
+                            xlabel(',<-- NW      X_{PoroTomo} [m]        SE -->');
                             ylabel('Z_{PoroTomo} [m]'); % (= elevation above WGS84 ellipsoid - 800 m'
                         end
                     case 3 % slicing plane is normal to Z axis
@@ -526,7 +592,11 @@ for knorm = [1,2,3]
                             axis xy
                             %% TODO Fix this
                             plot([nanmin(SLICES.Yp), nanmax(SLICES.Yp)],[nanmin(SLICES.Zp)+800, nanmax(SLICES.Zp)+800],'w.');
-                            ylabel('Elevation [m]','color','k');
+                            if short_labels == 1
+                                ylabel('Z [m]','color','k');
+                            else
+                                ylabel('Elevation [m]','color','k');
+                            end
                             ax = gca;
                             ax.YAxis(1).Color='k';
                             ax.YAxis(2).Color='k';
@@ -534,7 +604,11 @@ for knorm = [1,2,3]
                             yyaxis right
                             axis xy
                             plot([nanmin(SLICES.Xp), nanmax(SLICES.Xp)],[nanmin(SLICES.Zp)+800, nanmax(SLICES.Zp)+800],'w.');
-                            ylabel('Elevation [m]','color','k');
+                            if short_labels == 1
+                                ylabel('Z [m]','color','k');
+                            else
+                                ylabel('Elevation [m]','color','k');
+                            end
                             ax = gca;
                             ax.YAxis(1).Color='k';
                             ax.YAxis(2).Color='k';
@@ -559,12 +633,17 @@ for knorm = [1,2,3]
                 if flattened_cube == 1
                     subplot(2,2,2); % color bar in upper right
                 end
-                % color bar
+                %% color bar
                 h = colorbar;
                 %xlabel(h,'Vp [m/s]');
                 xlabel(h,OPTIONS.colorbarlabelstr);
                 
-                % save plot as PNG file with name
+%                 %% write contour levels on legend 
+%                 if contours == 1 && short_labels == 0
+%                     legend(sprintf('%4.1g\n',v_contours),'Location','bestoutside');
+%                 end
+                
+                %% save plot as graphics file with name
                 if flattened_cube == 1
                     fname_out = sprintf('%s_cubeX%05.0fmY%05.0fmZ%05.0fm',title_str...
                         ,SLICES.Xp(kslice),SLICES.Yp(kslice),SLICES.Zp(kslice));
@@ -580,6 +659,11 @@ for knorm = [1,2,3]
                             error(sprintf('unknown knorm %d\n',knorm));
                     end
                 end
+                % append name of geologic model to file name
+                fname_out = strcat(fname_out,'_',geologic_model);
+                
+                % call the appropriate printing function, which will append
+                % file type (e.g., '.pdf')
                 feval(funprint,fname_out);
                 kfiles = kfiles+1;
                 figfilenames{kfiles} = fname_out;
