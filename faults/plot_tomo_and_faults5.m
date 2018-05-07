@@ -1,4 +1,5 @@
-function figfilenames = plot_tomo_and_faults5(TOMO,FAULTS,title_str,BOUNDS,OPTIONS,funprint,rsearch, WELLS, elev_mean,BRADY2GRID, SLICES)
+function figfilenames = plot_tomo_and_faults5(TOMO,FAULTS,title_str,BOUNDS,OPTIONS,funprint...
+    ,rsearch, WELLS, elev_mean, BRADY2DGRID, SLICES)
 % make slices at BOUNDS of tomogram TOMO with faults in FAULTS
 % 20170921 Kurt Feigl
 % 20171203 Kurt Feigl - include topographic surface and depth
@@ -38,6 +39,7 @@ tstart = tic;
 
 % set faults
 if exist('OPTIONS','var') == 1
+    OPTIONS
     if isfield(OPTIONS,'vmin') == 1
         vmin=OPTIONS.vmin;
     else
@@ -91,7 +93,7 @@ if exist('OPTIONS','var') == 1
         extrapolation_method = 'linear';
     end
     if isfield(OPTIONS,'short_labels') == 1
-        extrapolation_method=OPTIONS.short_labels;
+        short_labels=OPTIONS.short_labels;
     else
         short_labels = 1;
     end
@@ -99,6 +101,21 @@ if exist('OPTIONS','var') == 1
         flattened_cube=OPTIONS.flattened_cube;
     else
         flattened_cube = 0;
+    end
+    if isfield(OPTIONS,'resolution_threshold') == 1
+        resolution_threshold=OPTIONS.resolution_threshold;
+    else
+        resolution_threshold = 0.0;
+    end
+    if isfield(OPTIONS,'geologic_model') == 1
+        geologic_model=OPTIONS.geologic_model;
+    else
+        geologic_model = '';
+    end
+    if isfield(OPTIONS,'draw_topo') == 1
+        draw_topo=OPTIONS.draw_topo;
+    else
+        draw_topo = '';
     end
 end
 
@@ -108,7 +125,19 @@ nxslices = numel(SLICES.Xp)
 nyslices = numel(SLICES.Yp)
 nzslices = numel(SLICES.Zp)
 
+%% clip out velocity values where resolution is poor
+if resolution_threshold > 0.0 && isfield(TOMO,'R') == 1
+    title_str = strcat(title_str,sprintf('_MRES_GT_%02d_percent',100*resolution_threshold))
+    ilowres = find(TOMO.R < resolution_threshold);
+    TOMO.V(ilowres) = NaN;
+end
 
+%% clip out velocity values where model voxel is above topographic surface
+if resolution_threshold > 0.0 && isfield(TOMO,'R') == 1
+    TOMO.topo=interp2(BRADY2DGRID.Xp,BRADY2DGRID.Yp,BRADY2DGRID.Zp,TOMO.Xp,TOMO.Yp);
+    iinair = find(TOMO.Zp > TOMO.topo);
+    TOMO.V(iinair) = NaN;
+end
 
 %% loop over normal direction
 for knorm = [1,2,3]
@@ -192,6 +221,10 @@ for knorm = [1,2,3]
         fprintf(1,'Starting 3-D scatteredInterpolant at t = %.001f seconds\n',toc(tstart));
         %extrapolation_method = 'none';
         %extrapolation_method = 'linear';
+        TOMO
+        interpolation_method
+        extrapolation_method
+        numel(TOMO.V(isfinite(TOMO.V)))
         Finterp2 = scatteredInterpolant(TOMO.Xp,TOMO.Yp,TOMO.Zp,TOMO.V ...
             ,interpolation_method,extrapolation_method);
         image2d = Finterp2(Q.x,Q.y,Q.z);
@@ -334,6 +367,30 @@ for knorm = [1,2,3]
                 %draw_faults(S,knorm,constant_coordinate,nmin,norder,plot_points,plot_curves,ksor);
                 draw_faults2(FAULTS,knorm,constant_coordinate,nmin,norder,plot_points,plot_curves,ksor);
                 
+                
+%                 %% draw the topographic surface, i.e. the interface between rock and air
+%                 if draw_topo == 1
+%                      switch knorm
+%                         case 1
+%                             for i=1:numel(TOMO.Xp)
+%                                 if abs(TOMO.Xp(i)-SLICES.Xp(kslice)) < 1*rsearch
+%                                     plot(TOMO.Yp(i),TOMO.topo(i),'o-','MarkerSize',7,'MarkerFaceColor',[0.5,0.5,0.5]);
+%                                 end
+%                             end
+%                         case 2
+%                             for i=1:numel(TOMO.Yp)
+%                                 if abs(TOMO.Yp(i)-SLICES.Yp(kslice)) < 1*rsearch
+%                                     plot(TOMO.Xp(i),TOMO.topo(i),'o-','MarkerSize',7,'MarkerFaceColor',[0.5,0.5,0.5]);
+%                                 end
+%                             end
+%                         case 3
+%                             fprintf('Not plotting topography on map view.\n');
+%                         otherwise
+%                             error(sprintf('unknown knorm = %d\n',knorm));
+%                     end
+%                 end
+                
+                
                 %% draw the wells
                 if draw_wells == 1
                     switch knorm
@@ -386,12 +443,17 @@ for knorm = [1,2,3]
                 if flattened_cube ~= 1
                     switch knorm
                         case 1
-                            title(sprintf('X_{PoroTomo} = %10.1f meters\n(%s)',constant_coordinate,strrep(title_str,'_',' ')));
+                            title(sprintf('%s\nX_{PoroTomo} = %10.1f meters'...
+                                ,strrep(title_str,'_',' ') ...
+                                ,constant_coordinate));
                         case 2
-                            title(sprintf('Y_{PoroTomo} = %10.1f meters\n(%s)',constant_coordinate,strrep(title_str,'_',' ')));
+                            title(sprintf('%s\nY_{PoroTomo} = %10.1f meters'...
+                                ,strrep(title_str,'_',' ') ...
+                                ,constant_coordinate));
                         case 3
-                            title(sprintf('Z_{PoroTomo} = %7.0f m; depth = %7.0f m; (\n%s)'...
-                                ,constant_coordinate,elev_mean-constant_coordinate-800,strrep(title_str,'_',' ')));
+                            title(sprintf('%s\nZ_{PoroTomo} = %7.0f m; depth = %7.0f m'...
+                                ,strrep(title_str,'_',' ')...
+                                ,constant_coordinate,elev_mean-constant_coordinate-800));
                         otherwise
                             error(sprintf('unknown knorm %d\n',knorm));
                     end
@@ -462,6 +524,7 @@ for knorm = [1,2,3]
                         case 1
                             yyaxis right
                             axis xy
+                            %% TODO Fix this
                             plot([nanmin(SLICES.Yp), nanmax(SLICES.Yp)],[nanmin(SLICES.Zp)+800, nanmax(SLICES.Zp)+800],'w.');
                             ylabel('Elevation [m]','color','k');
                             ax = gca;

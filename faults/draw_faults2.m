@@ -36,7 +36,7 @@ switch knorm
 end
 
 % count number of faults
-nfaults = numel(S);
+nfaults = numel(S)
 
 dc = 10 ; % spacing in meters
 for i=1:nfaults
