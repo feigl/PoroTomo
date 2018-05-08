@@ -1,5 +1,5 @@
-function figfilenames = plot_tomo_and_faults5(TOMO,FAULTS,title_str,BOUNDS,OPTIONS,funprint...
-    ,rsearch, WELLS, elev_mean, BRADY2DGRID, SLICES)
+function figfilenames = plot_tomo_and_faults6(TOMO,FAULTS,title_str,BOUNDS,OPTIONS,funprint...
+    ,rsearch, WELLS, elev_mean, BRADY2DGRID, SLICES, BRADYBOX)
 % make slices at BOUNDS of tomogram TOMO with faults in FAULTS
 % 20170921 Kurt Feigl
 % 20171203 Kurt Feigl - include topographic surface and depth
@@ -127,6 +127,11 @@ if exist('OPTIONS','var') == 1
     else
         contours = 0;
     end
+    if isfield(OPTIONS,'draw_box') == 1
+        draw_box=OPTIONS.draw_box;
+    else
+        draw_box = 0;
+    end
 end
 
 
@@ -144,8 +149,8 @@ end
 
 %% clip out velocity values where model voxel is above topographic surface
 if resolution_threshold > 0.0 && isfield(TOMO,'R') == 1
-    TOMO.topo=interp2(BRADY2DGRID.Xp,BRADY2DGRID.Yp,BRADY2DGRID.Zp,TOMO.Xp,TOMO.Yp);
-    iinair = find(TOMO.Zp > TOMO.topo);
+    topo=interp2(BRADY2DGRID.Xp,BRADY2DGRID.Yp,BRADY2DGRID.Zp,TOMO.Xp,TOMO.Yp);
+    iinair = find(TOMO.Zp > topo);
     TOMO.V(iinair) = NaN;
 end
 
@@ -337,7 +342,27 @@ for knorm = [1,2,3]
                 % clip outside the axes
                 ax = gca;
                 ax.Clipping='On';
-                              
+                   
+                %% draw box around natural laboratory
+                if draw_box == 1
+                    
+                    switch knorm
+                        case 1
+                            plot([min(BRADYBOX.Yp),max(BRADYBOX.Yp),max(BRADYBOX.Yp),min(BRADYBOX.Yp),min(BRADYBOX.Yp)]...
+                                ,[0               ,0.              ,max(BRADYBOX.Zp),max(BRADYBOX.Zp),0.             ]...
+                                ,'-','color',[0.5, 0.5, 0.5]);
+                        case 2
+                            plot([min(BRADYBOX.Xp),max(BRADYBOX.Xp),max(BRADYBOX.Xp),min(BRADYBOX.Xp),min(BRADYBOX.Xp)]...
+                                ,[0               ,0.              ,max(BRADYBOX.Zp),max(BRADYBOX.Zp),0.             ]...
+                               ,'-','color',[0.5, 0.5, 0.5]);
+                        case 3
+                            i5 = [1,2,3,4,1]; % indices to close rectangle
+                            plot(BRADYBOX.Xp(i5),BRADYBOX.Yp(i5),'-','color',[0.5, 0.5, 0.5]);
+                        otherwise
+                            error(sprintf('unknown knorm = %d\n',knorm));
+                    end
+                end
+
                 
                 %% draw contours
                 if contours == 1
@@ -370,8 +395,9 @@ for knorm = [1,2,3]
                 if draw_topo == 1
                      switch knorm
                         case 1
-                            for i=1:numel(TOMO.Xp)
-                                if abs(TOMO.Xp(i)-SLICES.Xp(kslice)) < 1*rsearch
+                            
+                            topo=interp2(BRADY2DGRID.Xp,BRADY2DGRID.Yp,BRADY2DGRID.Zp,TOMO.Xp,TOMO.Yp);
+
                                     plot(TOMO.Yp(i),TOMO.topo(i),'o-','MarkerSize',7,'MarkerFaceColor',[0.5,0.5,0.5]);
                                 end
                             end
