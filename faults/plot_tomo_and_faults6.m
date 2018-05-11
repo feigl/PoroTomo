@@ -464,7 +464,7 @@ for knorm = [1,2,3]
                             end
                         case 3
                             for i=1:nwells
-                                plot(WELLS.grdsurf.Xp(i),WELLS.grdsurf.Yp(i),well_symbols{i},'MarkerSize',5,'MarkerFaceColor','none');
+                                plot(WELLS.grdsurf.Xp(i),WELLS.grdsurf.Yp(i),well_symbols{i},'MarkerSize',5,'MarkerFaceColor','k','LineWidth',1);
                             end
                         otherwise
                             error(sprintf('unknown knorm = %d\n',knorm));
@@ -547,7 +547,6 @@ for knorm = [1,2,3]
                     case 1 % slicing plane is normal to X axis
                         if short_labels == 1
                             xlabel('Y [m]');
-                            %ylabel('Z [m]'); % (= elevation above WGS84 ellipsoid - 800 m'
                             set(gca,'YTickLabel','');
                         else
                             xlabel('<-- SW       Y_{PoroTomo} [m]        NE -->');
@@ -556,7 +555,6 @@ for knorm = [1,2,3]
                     case 2 % slicing plane is normal to Y axis
                         if short_labels == 1
                             xlabel('X [m]');
-                            %ylabel('Z [m]'); % (= elevation above WGS84 ellipsoid - 800 m'
                             set(gca,'YTickLabel','');
                         else
                             xlabel(',<-- NW      X_{PoroTomo} [m]        SE -->');
