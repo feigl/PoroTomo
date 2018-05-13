@@ -557,7 +557,7 @@ for knorm = [1,2,3]
                             xlabel('X [m]');
                             set(gca,'YTickLabel','');
                         else
-                            xlabel(',<-- NW      X_{PoroTomo} [m]        SE -->');
+                            xlabel('<-- NW      X_{PoroTomo} [m]        SE -->');
                             ylabel('Z_{PoroTomo} [m]'); % (= elevation above WGS84 ellipsoid - 800 m'
                         end
                     case 3 % slicing plane is normal to Z axis
