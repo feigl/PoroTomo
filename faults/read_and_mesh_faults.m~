@@ -121,7 +121,7 @@ elseif strcmp(geologic_model,'Siler') == 1
     SS=table2struct(T,'ToScalar',true)
     faultnames=unique(SS.FaultID);
     nfaults = numel(faultnames)
-   %nfaults = 1 % for debugging
+    nfaults = 1 % for debugging
     
     for i = 1:nfaults
        ifault = find(strcmp(SS.FaultID,faultnames{i}) == 1);
@@ -148,13 +148,16 @@ for i=1:nfaults
     %     XYZ = [S(i).PR.x, S(i).PR.y, S(i).PR.z];
     %[S(i).kfaces, S(i).kbounds] = triangulatexyz(S(i).PR.x, S(i).PR.y, S(i).PR.z,titlestr);
     %[S(i).kfaces, S(i).kbounds] = triangulatexyz2(S(i).PR.x, S(i).PR.y, S(i).PR.z,titlestr);
-    [S(i).TRI,S(i).trigood,S(i).Xtri,S(i).Ytri,S(i).Ztri] = triangulatexyz3(S(i).PR.x, S(i).PR.y, S(i).PR.z,titlestr,make_plots);
+    [S(i),lgood] = triangulatexyz3(S(i).PR.x, S(i).PR.y, S(i).PR.z,titlestr,make_plots);
     
     %     %if isfinitearray(S(i).kbounds) == 1 && isfinitearray(S(i).kfaces) == 1
     %     if isfinitearray(S(i).kfaces) == 1
-    if numel(S(i).trigood(S(i).trigood)) > 0
-       ngood = ngood+1;
-    end
+    if numel(lgood(lgood)) > 0
+        S(i).isok = 1;
+    ngood = ngood+1;
+    else
+        S(i).isok = 0;
+end
 end
 
 return
