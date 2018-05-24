@@ -1,4 +1,4 @@
-function [kfaces,kboundary] = triangulatexyz2(X,Y,Z,titlestr)
+function [kfaces,kboundary] = triangulatexyz2(X,Y,Z,titlestr,make_plots)
 %% Generate kfaces of a fault by projecting onto a plane and then triangulating
 %function F = triangulatexyz(XYZ,doplots)
 % inputs:
@@ -157,7 +157,7 @@ if make_plots == 1
     xlabel('U');
     ylabel('V');
     title(sprintf('%s\n%s',titlestr,'Projected coordinates with boundary'));
-    close all
+    %close all
     
     
     %% plot mesh in 3D
@@ -182,7 +182,7 @@ if make_plots == 1
     zlabel('Z');
     grid on;
     view([1, -1, 1]);
-    printpng(sprintf('%s_%s.png',mfilename,strrep(titlestr,'/','_')));
+    %printpng(sprintf('%s_%s.png',mfilename,strrep(titlestr,'/','_')));
 end
 
 return
