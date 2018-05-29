@@ -4,7 +4,7 @@ function S = read_and_mesh_faults(geologic_model,make_plots)
 
 % 20180209 Kurt Feigl
 
-if strcmp(geologic_model,'Jolie') == 1
+if contains(geologic_model,'Jolie') == 1
     %% Jolie et al. Models
     %dirname = '/Users/feigl/BoxSync/PoroTomo/BradysEGSProject/DATA v2012 02 14/Fault_Files/';
     dirname = '/Users/feigl/BoxSync/PoroTomo/BradysEGSProject/DATAv20120214/Fault_Files/';
@@ -17,7 +17,7 @@ if strcmp(geologic_model,'Jolie') == 1
     nfaults = nr
     %nfaults = 5 
 
-    
+    %% Select most important faults
     % From: Nicholas Davatzes <davatzes@temple.edu>
     % Date: 2017- Jun-29 Thursday at 15:23
     % To: Kurt Feigl <feigl@wisc.edu>
@@ -25,7 +25,11 @@ if strcmp(geologic_model,'Jolie') == 1
     %
     % Kurt,
     %
-    % You should have received a Google Drive invitation so that you can download notes to help you with picking faults; this of course neglects the import geological horizons which could play a role as aquifers or whose boundaries along faults might mark interesting transitions.
+    % You should have received a Google Drive invitation so that you can
+    % download notes to help you with picking faults; this of course
+    % neglects the import geological horizons which could play a role as
+    % aquifers or whose boundaries along faults might mark interesting
+    % transitions.
     %
     % Cheers,
     % Nick
@@ -46,18 +50,21 @@ if strcmp(geologic_model,'Jolie') == 1
     % fblk1028_1			important crossing fault
     % fblk1010_3
     % To explore, use VTK files and Paraview or Matlab Scripts
-    % Select most important faults
-    kount=0;
-    kount=kount+1; flisting{kount} = strcat(dirname,'1027ft_1');
-    kount=kount+1; flisting{kount} = strcat(dirname,'1012ft_1');
-    kount=kount+1; flisting{kount} = strcat(dirname,'1012fta_1');
-    kount=kount+1; flisting{kount} = strcat(dirname,'1011ft_1');
-    kount=kount+1; flisting{kount} = strcat(dirname,'1015_1');
-    kount=kount+1; flisting{kount} = strcat(dirname,'1024_1');
-    kount=kount+1; flisting{kount} = strcat(dirname,'1007ft_1');
-    kount=kount+1; flisting{kount} = strcat(dirname,'1028_1');
-    kount=kount+1; flisting{kount} = strcat(dirname,'1010_1');
-    flisting = flisting'; % make into a column vector of strings
+    
+    if strcmp(geologic_model,'Jolie9')
+        kount=0;
+        kount=kount+1; flisting{kount} = strcat(dirname,'1027ft_1');
+        kount=kount+1; flisting{kount} = strcat(dirname,'1012ft_1');
+        kount=kount+1; flisting{kount} = strcat(dirname,'1012fta_1');
+        kount=kount+1; flisting{kount} = strcat(dirname,'1011ft_1');
+        kount=kount+1; flisting{kount} = strcat(dirname,'1015_1');
+        kount=kount+1; flisting{kount} = strcat(dirname,'1024_1');
+        kount=kount+1; flisting{kount} = strcat(dirname,'1007ft_1');
+        kount=kount+1; flisting{kount} = strcat(dirname,'1028_1');
+        kount=kount+1; flisting{kount} = strcat(dirname,'1010_1');
+        flisting = flisting'; % make into a column vector of strings
+        nfaults = kount;
+    end
     
     
     for i=1:nfaults

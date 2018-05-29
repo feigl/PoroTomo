@@ -205,6 +205,8 @@ for i=1:ntriangles
         lgood(i) = true;
     end
 end
+%lgood = true(ntriangles,1);
+
 
 %% prune
 igood = find(lgood==true);

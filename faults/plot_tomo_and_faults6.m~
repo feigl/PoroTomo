@@ -411,7 +411,7 @@ for knorm = [1,2,3]
                            yrun = [yrun;nanmax(BOUNDS.Yp);nanmin(BOUNDS.Yp)];
                            topo = [topo;nanmax(BOUNDS.Zp);nanmax(BOUNDS.Zp)];
                            patch(yrun,topo,'w');
-                           plot(yrun(1:end-2),topo(1:end-2),'w-','LineWidth',3);
+                           plot(yrun(1:end-2),topo(1:end-2),'w-','LineWidth',1);
                          case 2                         
                            xrun = colvec([nanmin(BOUNDS.Xp):10:nanmax(BOUNDS.Xp)]);
                            yrun = constant_coordinate*ones(size(xrun));
@@ -421,7 +421,7 @@ for knorm = [1,2,3]
                            topo = [topo;nanmax(BOUNDS.Zp);nanmax(BOUNDS.Zp)];
                            whos topo yrun
                            patch(xrun,topo,'w');
-                           plot(xrun(1:end-2),topo(1:end-2),'w-','LineWidth',3);
+                           plot(xrun(1:end-2),topo(1:end-2),'k-','LineWidth',1);
                         case 3
                             fprintf('Not plotting topography on map view.\n');
                         otherwise

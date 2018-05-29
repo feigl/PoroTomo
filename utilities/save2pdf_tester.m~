@@ -1,0 +1,5 @@
+clear all
+close all
+histogram(randn([1000,1]))
+%save2pdf('test.pdf',gcf,1200);
+%printpdf('test.pdf',1200);
