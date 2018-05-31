@@ -39,15 +39,14 @@ else
     end
    
     
-    size(XGRD)
-    size(YGRD)
-    size(ZGRD)
+%     size(XGRD)
+%     size(YGRD)
+%     size(ZGRD)
     % build the 2-D interpolant function
-    Finterpolant = scatteredInterpolant(colvec(XGRD),colvec(YGRD),colvec(ZGRD))
-    Finterpolant.Method='linear'
-    Finterpolant.ExtrapolationMethod ='none'
+    Finterpolant = scatteredInterpolant(colvec(XGRD),colvec(YGRD),colvec(ZGRD));
+    Finterpolant.Method='linear';
+    Finterpolant.ExtrapolationMethod ='none';
  
-   
     
     % evaluate the interpolant function at the query points
     elevation = Finterpolant(colvec(xq),colvec(yq));

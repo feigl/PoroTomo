@@ -35,7 +35,7 @@ if nargin<2 || ishandle(handle)==0
     handle = gcf;
 end
 if nargin<3
-    dpi = 150;
+    dpi = 600;
 end
 
 % Backup previous settings
