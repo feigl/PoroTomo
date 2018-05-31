@@ -4,9 +4,9 @@ function isok = isfinitearray(A)
 ncount = numel(A);
 nfinite = sum(isfinite(reshape(A,ncount,1)));
 if ncount == nfinite
-    isok = 1;
+    isok = true;
 else
-    isok = 0;
+    isok = false;
 end
 return
 
