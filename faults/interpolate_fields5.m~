@@ -41,11 +41,12 @@ if strcmp(myos, 'GLNXA64')==1
     fprintf(1,'Linux computer\n');
 end
 
-hostname = system('hostname')
+[status,hostname] = system('hostname')
 if contains(hostname,'porotomo') == 1
     boxdir = '/mnt/u1/feigl/BoxSync'
 else
-    boxdir = strcat(homedir/BoxSync
+    boxdir = strcat(homedir,filesep,'BoxSync')
+end
 
 
 %% before releasing, find dependencies using:
@@ -64,7 +65,7 @@ funprint = str2func('printjpg'); % JPG
 
 %% Digital Elevation model in Latitude and Longitude
 % TODO: should use webget to ftp://roftp.ssec.wisc.edu/porotomo/PoroTomo/METADATA/
-demgrdfilename = '/Users/feigl/BoxSync/PoroTomo/METADATA/brady_dem_srtm_20m.grd'
+demgrdfilename = strcat(boxdir,'/PoroTomo/METADATA/brady_dem_srtm_20m.grd')
 
 %% get the coordinates of the study area
 utmzone = '11 S' % UTM zone for Brady Hot Springs
@@ -153,7 +154,8 @@ MESH3.H = reshape(MESH3.H,size(MESH3.Xp));
 
 
 %% read the file containing coordinates of nodes
-dirname = '/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_4_Adjoint_seismic_tomography/MESH_SPECFEM3D'
+%dirname = '/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_4_Adjoint_seismic_tomography/MESH_SPECFEM3D'
+dirname = strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_4_Adjoint_seismic_tomography/MESH_SPECFEM3D')
 fname_nodes = strcat(dirname,filesep,'MESH_topo_xpypzellipsoid_800/nodes_coords_file');
 NODES = read_nodes(fname_nodes);
 
@@ -174,6 +176,7 @@ CENTROIDS.ElevWGS84 = get_elevation(CENTROIDS.Lon,CENTROIDS.Lat,demgrdfilename) 
 save('CENTROIDS.mat','-struct','CENTROIDS');
 
 
+
 %% read the faults.
 % S == structure containing fault coordinates
 % /Users/feigl/Box
@@ -186,11 +189,11 @@ save('CENTROIDS.mat','-struct','CENTROIDS');
 geologic_model = 'Siler'
 if strcmp(geologic_model,'Jolie9')
 %    load('/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/faults_for_Cliff/read_and_mesh_faults10.mat'); % Nick's Top9
-    load('/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Siler/Jolie9.mat'); % All faults
+    load(strcat(boxdir,filsep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Siler/Jolie9.mat')); % All faults
 elseif strcmp(geologic_model,'Jolie')
-    load('/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Siler/Jolie.mat'); % All faults
+    load(strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Siler/Jolie.mat')); % All faults
 elseif strcmp(geologic_model,'Siler')
-    load('/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Siler/Siler.mat'); % All in Siler's model
+    load(load(strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Siler/Siler.mat')); % All in Siler's model
 else
     error(sprintf('Unknown geologic_model: %s\n',geologic_model));
 end
@@ -217,7 +220,7 @@ WELLS.Zp=colvec(WELLS.Zp);
 zprof=colvec([min(BOUNDS.Zp):1:max(BOUNDS.Zp)]);
 
 %% get the coordinates of the fumaroles
-T=readtable('/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Surface_features/brady_fumerole_ll.txt');
+T=readtable(load(strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Surface_features/brady_fumerole_ll.txt'));
 lonlat = table2struct(T,'ToScalar',true);
 FUMAROLES.Lon = lonlat.Var1;
 FUMAROLES.Lat = lonlat.Var2;
@@ -236,7 +239,7 @@ end
 save('FUMAROLES.mat','-struct','FUMAROLES');
 
 %% get the coordinates of the mudpots
-T=readtable('/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Surface_features/brady_mudpot_ll.txt');
+T=readtable(load(strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Surface_features/brady_mudpot_ll.txt'));
 lonlat = table2struct(T,'ToScalar',true);
 MUDPOTS.Lon = lonlat.Var1;
 MUDPOTS.Lat = lonlat.Var2;
@@ -356,7 +359,7 @@ for obsq = obsqs
             %/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_4_Adjoint_seismic_tomography/MESH_SPECFEM3D/
             
             % Read the file containing density values
-            dirname = '/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/WitterDensity'
+            dirname = load(strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/WitterDensity')
             %fname_witter_density = 'Bradys_Output_Density_gcm3_UTMNAD83_zone11_with_NDV.csv'; % with NoDataValues set to 9999
             fname_witter_density = 'Bradys_Output_Density_gcm3_UTMNAD83_zone11.csv'; % omits missing data values
             T=readtable(strcat(dirname,filesep,fname_witter_density));
@@ -414,9 +417,9 @@ for obsq = obsqs
                 %[MATZEL.Xp,MATZEL.Yp,MATZEL.Zp] = utm2xyz_porotomo(MATZEL.E,MATZEL.N,MATZEL.elevation);
                 
                 %% new version of November 2017, including Qs
-                dirname = '/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_3_Seismic_ANT/'
+                dirname = strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_3_Seismic_ANT')
                 fname_matzel_sweep_interf = 'Porotomo_Sweep_Interferometry_Model.version_Nov2017.XYcoordinates.txt'; % omits missing data values
-                T=readtable(strcat(dirname,fname_matzel_sweep_interf),'ReadVariableNames',true,'HeaderLines',0);
+                T=readtable(strcat(dirname,filesep,fname_matzel_sweep_interf),'ReadVariableNames',true,'HeaderLines',0);
                 MATZEL = table2struct(T,'ToScalar',true);
                 
                 %         xporo(m)		yporo(m)	z(depth)	vp(m/s)		vs(m/s)		  qp			qs
@@ -546,7 +549,7 @@ for obsq = obsqs
         case 5
             
             %% P-wave velocity from Lesley Parker and Cliff Thurber
-            dirname = '/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/faults_for_Cliff'
+            dirname = strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/faults_for_Cliff')
             tomo_filename = 'velfile20170727.txt'
             XYZVthurber = load(strcat(dirname,filesep,tomo_filename));
             iok = find(XYZVthurber(:,4) > 0); % find indices of non-zero velocities

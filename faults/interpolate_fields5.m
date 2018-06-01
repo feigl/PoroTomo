@@ -65,7 +65,7 @@ funprint = str2func('printjpg'); % JPG
 
 %% Digital Elevation model in Latitude and Longitude
 % TODO: should use webget to ftp://roftp.ssec.wisc.edu/porotomo/PoroTomo/METADATA/
-demgrdfilename = '/Users/feigl/BoxSync/PoroTomo/METADATA/brady_dem_srtm_20m.grd'
+demgrdfilename = strcat(boxdir,'/PoroTomo/METADATA/brady_dem_srtm_20m.grd')
 
 %% get the coordinates of the study area
 utmzone = '11 S' % UTM zone for Brady Hot Springs
@@ -175,7 +175,6 @@ CENTROIDS = read_centroids(fname_centroids);
 CENTROIDS.ElevWGS84 = get_elevation(CENTROIDS.Lon,CENTROIDS.Lat,demgrdfilename) - (CENTROIDS.Zp + 400); % Elevation_in_meters_aboveWGS84ellipsoid
 save('CENTROIDS.mat','-struct','CENTROIDS');
 
-return
 
 
 %% read the faults.
@@ -190,11 +189,11 @@ return
 geologic_model = 'Siler'
 if strcmp(geologic_model,'Jolie9')
 %    load('/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/faults_for_Cliff/read_and_mesh_faults10.mat'); % Nick's Top9
-    load('/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Siler/Jolie9.mat'); % All faults
+    load(strcat(boxdir,filsep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Siler/Jolie9.mat')); % All faults
 elseif strcmp(geologic_model,'Jolie')
-    load('/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Siler/Jolie.mat'); % All faults
+    load(strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Siler/Jolie.mat')); % All faults
 elseif strcmp(geologic_model,'Siler')
-    load('/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Siler/Siler.mat'); % All in Siler's model
+    load(strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Siler/Siler.mat')); % All in Siler's model
 else
     error(sprintf('Unknown geologic_model: %s\n',geologic_model));
 end
@@ -221,7 +220,7 @@ WELLS.Zp=colvec(WELLS.Zp);
 zprof=colvec([min(BOUNDS.Zp):1:max(BOUNDS.Zp)]);
 
 %% get the coordinates of the fumaroles
-T=readtable('/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Surface_features/brady_fumerole_ll.txt');
+T=readtable(strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Surface_features/brady_fumerole_ll.txt'));
 lonlat = table2struct(T,'ToScalar',true);
 FUMAROLES.Lon = lonlat.Var1;
 FUMAROLES.Lat = lonlat.Var2;
@@ -240,7 +239,7 @@ end
 save('FUMAROLES.mat','-struct','FUMAROLES');
 
 %% get the coordinates of the mudpots
-T=readtable('/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Surface_features/brady_mudpot_ll.txt');
+T=readtable(strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Surface_features/brady_mudpot_ll.txt'));
 lonlat = table2struct(T,'ToScalar',true);
 MUDPOTS.Lon = lonlat.Var1;
 MUDPOTS.Lat = lonlat.Var2;
@@ -360,7 +359,7 @@ for obsq = obsqs
             %/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_4_Adjoint_seismic_tomography/MESH_SPECFEM3D/
             
             % Read the file containing density values
-            dirname = '/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/WitterDensity'
+            dirname = strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/WitterDensity')
             %fname_witter_density = 'Bradys_Output_Density_gcm3_UTMNAD83_zone11_with_NDV.csv'; % with NoDataValues set to 9999
             fname_witter_density = 'Bradys_Output_Density_gcm3_UTMNAD83_zone11.csv'; % omits missing data values
             T=readtable(strcat(dirname,filesep,fname_witter_density));
@@ -418,9 +417,9 @@ for obsq = obsqs
                 %[MATZEL.Xp,MATZEL.Yp,MATZEL.Zp] = utm2xyz_porotomo(MATZEL.E,MATZEL.N,MATZEL.elevation);
                 
                 %% new version of November 2017, including Qs
-                dirname = '/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_3_Seismic_ANT/'
+                dirname = strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_3_Seismic_ANT')
                 fname_matzel_sweep_interf = 'Porotomo_Sweep_Interferometry_Model.version_Nov2017.XYcoordinates.txt'; % omits missing data values
-                T=readtable(strcat(dirname,fname_matzel_sweep_interf),'ReadVariableNames',true,'HeaderLines',0);
+                T=readtable(strcat(dirname,filesep,fname_matzel_sweep_interf),'ReadVariableNames',true,'HeaderLines',0);
                 MATZEL = table2struct(T,'ToScalar',true);
                 
                 %         xporo(m)		yporo(m)	z(depth)	vp(m/s)		vs(m/s)		  qp			qs
@@ -550,7 +549,7 @@ for obsq = obsqs
         case 5
             
             %% P-wave velocity from Lesley Parker and Cliff Thurber
-            dirname = '/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/faults_for_Cliff'
+            dirname = strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/faults_for_Cliff')
             tomo_filename = 'velfile20170727.txt'
             XYZVthurber = load(strcat(dirname,filesep,tomo_filename));
             iok = find(XYZVthurber(:,4) > 0); % find indices of non-zero velocities
@@ -657,7 +656,7 @@ for obsq = obsqs
             %
             % Cliff
           
-            dirname = '/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_2_Seismic_travel_time'
+            dirname = strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_2_Seismic_travel_time')
             tomo_filename = 'VpThurber20171123.vel'
             XYZVthurber = load(strcat(dirname,filesep,tomo_filename));
             iok = find(XYZVthurber(:,4) > 0); % find indices of non-zero velocities
@@ -713,7 +712,7 @@ for obsq = obsqs
 
           
             %dirname = '/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_2_Seismic_travel_time'
-            dirname = '/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_2_Seismic_travel_time/Thurber20180504PoroTomo_Z'
+            dirname = strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_2_Seismic_travel_time/Thurber20180504PoroTomo_Z')
             % read velocity
             tomo_filename = 'velfile.porotomo'
             XYZVthurber = load(strcat(dirname,filesep,tomo_filename));
@@ -773,7 +772,7 @@ for obsq = obsqs
             % yet- do be done after SSA). Thanks. Avinash
             
             
-            dirname = '/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_2_Seismic_travel_time/Nayak20180513'
+            dirname = strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_2_Seismic_travel_time/Nayak20180513')
             % read velocity
             tomo_filename = 'vp_new.txt'
             XYZVthurber = load(strcat(dirname,filesep,tomo_filename));
@@ -833,7 +832,7 @@ for obsq = obsqs
             save('VpNayak20180513.mat','-struct','TOMO');
         case 6
             %% ZengMASWonDAS
-            dirname = '/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_1_DAS_Quality_Control/SurfaceWave'
+            dirname = strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_1_DAS_Quality_Control/SurfaceWave')
             % read the coordinates of the DAS segments in rotated PoroTomo coordinates
             locf='seg_center_loc.dat';
             fid=fopen(strcat(dirname,filesep,locf),'r');
@@ -884,7 +883,7 @@ for obsq = obsqs
             
             % get the topographic elevation of the nodes in the model
             % TODO: should use webget to ftp://roftp.ssec.wisc.edu/porotomo/PoroTomo/METADATA/
-            demgrdfilename = '/Users/feigl/BoxSync/PoroTomo/METADATA/brady_dem_srtm_20m.grd'
+            demgrdfilename = strcat(boxdir,filesep,'PoroTomo/METADATA/brady_dem_srtm_20m.grd');
             das_z = get_elevation(das_lon,das_lat,demgrdfilename);
             elevation_mean = nanmean(das_z)
             nf=nf+1;figure(nf);
@@ -902,7 +901,7 @@ for obsq = obsqs
             
             % read the velocity values from the many files
             %dirname = strcat(dirname,filesep,'seg.model');
-            dirname = '/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_1_DAS_Quality_Control/SurfaceWave2/newmodel';
+            dirname = strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_1_DAS_Quality_Control/SurfaceWave2/newmodel');
             postfix='mod.dat';
             %nlay=27;
             nlay=11; % updated 20171211
@@ -1117,7 +1116,7 @@ for obsq = obsqs
             %
              
             % Read the file containing density values
-            dirname = '/Users/feigl/BoxSync/PoroTomo/Task4_Design_Deployment/Subtask4_9_Incorporate_Geologic_Information/SilerBradysGeoModelData'
+            dirname = strcat(boxdir,filesep,'PoroTomo/Task4_Design_Deployment/Subtask4_9_Incorporate_Geologic_Information/SilerBradysGeoModelData')
             fname_siler_lithology = 'Lithology.pdat'; % 
             T=readtable(strcat(dirname,filesep,fname_siler_lithology),'HeaderLines',16,'FileType','text');
             LITHOLOGY = table2struct(T,'ToScalar',true)
@@ -1168,7 +1167,7 @@ for obsq = obsqs
 %             
 
 % 
-            dirname = '/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Siler'
+            dirname = strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Siler')
             T=readtable(strcat(dirname,filesep,'SilerCorrelations.xlsx'),'Sheet',1);
             LITHCODES=table2struct(T,'ToScalar',true)
             LITHCODES.Lithology = strrep(LITHCODES.Lithology,'\t',' ');
