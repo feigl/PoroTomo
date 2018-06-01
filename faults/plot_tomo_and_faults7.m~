@@ -27,6 +27,11 @@ function figfilenames = plot_tomo_and_faults7(TOMO,FAULTS,title_str,BOUNDS,OPTIO
 % values in the cross-sections.
 % 20180224 Kurt Feigl
 %  handle flattened cube case by changing SLICES to BOUNDS
+% 20180531 Kurt Feigl 
+%  Add fumaroles, mudpots to list of arguments
+%  Plot topographic surface
+% 20180601 Kurt Feigl
+%  Correct labels on Y-norm cross sections
 
 % initialize
 kfiles = 0;
@@ -137,6 +142,11 @@ if exist('OPTIONS','var') == 1
         draw_mudpots=OPTIONS.draw_mudpots;
     else
         draw_mudpots = 0;
+    end
+    if isfield(OPTIONS,'draw_fumaroles') == 1
+        draw_fumaroles=OPTIONS.draw_fumaroles;
+    else
+        draw_fumaroles = 0;
     end
 end
 
@@ -356,17 +366,19 @@ for knorm = [1,2,3]
                             plot([min(BRADYBOX.Yp),max(BRADYBOX.Yp),max(BRADYBOX.Yp),min(BRADYBOX.Yp),min(BRADYBOX.Yp)]...
                                 ,[0               ,0.              ,max(BRADYBOX.Zp),max(BRADYBOX.Zp),0.             ]...
                                 ,'-','color',[0.5, 0.5, 0.5]);
-                            AX.XTick = [nanmin(BOUNDS.Yp):200:nanmax(BOUNDS.Yp)];
+                            AX.XTick = [nanmin(BOUNDS.Yp):300:nanmax(BOUNDS.Yp)];
                             AX.YTick = [nanmin(BOUNDS.Zp):200:nanmax(BOUNDS.Zp)];
                         case 2
                             plot([min(BRADYBOX.Xp),max(BRADYBOX.Xp),max(BRADYBOX.Xp),min(BRADYBOX.Xp),min(BRADYBOX.Xp)]...
                                 ,[0               ,0.              ,max(BRADYBOX.Zp),max(BRADYBOX.Zp),0.             ]...
                                ,'-','color',[0.5, 0.5, 0.5]);
-                            AX.XTick = [nanmin(BOUNDS.Xp):200:nanmax(BOUNDS.Xp)];
+                            AX.XTick = [nanmin(BOUNDS.Xp):250:nanmax(BOUNDS.Xp)];
                             AX.YTick = [nanmin(BOUNDS.Zp):200:nanmax(BOUNDS.Zp)];
                        case 3
                             i5 = [1,2,3,4,1]; % indices to close rectangle
                             plot(BRADYBOX.Xp(i5),BRADYBOX.Yp(i5),'-','color',[0.5, 0.5, 0.5]);
+                            AX.XTick = [nanmin(BOUNDS.Xp):250:nanmax(BOUNDS.Xp)];
+                            AX.YTick = [nanmin(BOUNDS.Yp):300:nanmax(BOUNDS.Yp)];
                         otherwise
                             error(sprintf('unknown knorm = %d\n',knorm));
                     end
@@ -493,24 +505,22 @@ for knorm = [1,2,3]
 
                 %% draw mudpots
                 if draw_mudpots == 1
-                    % plot(MUDPOTS.Xp,    MUDPOTS.Yp,'kd','MarkerFaceColor','w','MarkerSize',7);
-                    % plot(FUMAROLES.Xp,FUMAROLES.Yp,'kd','MarkerFaceColor','r','MarkerSize',7);
                     switch knorm
                         case 1
                             for i=1:numel(MUDPOTS.Xp)
-                                if abs(MUDPOTS.Xp(i)-SLICES.Xp(kslice)) < 10*rsearch
+                                if abs(MUDPOTS.Xp(i)-SLICES.Xp(kslice)) < 1*rsearch
                                     plot(MUDPOTS.Yp(i),MUDPOTS.Zp(i),'kd','MarkerFaceColor','w','MarkerSize',7);
                                 end
                             end
                         case 2
                             for i=1:numel(MUDPOTS.Yp)
-                                if abs(MUDPOTS.Yp(i)-SLICES.Yp(kslice)) < 10*rsearch
+                                if abs(MUDPOTS.Yp(i)-SLICES.Yp(kslice)) < 1*rsearch
                                     plot(MUDPOTS.Xp(i),MUDPOTS.Zp(i),'kd','MarkerFaceColor','w','MarkerSize',7);
                                 end
                             end
                         case 3
                             for i=1:numel(MUDPOTS.Zp)
-                                if MUDPOTS.Zp(i) >= max(SLICES.Zp) % only plot on uppermost slice
+                                if SLICES.Zp(kslice) >= max(SLICES.Zp) % only plot on uppermost slice
                                    plot(MUDPOTS.Xp,MUDPOTS.Yp,'kd','MarkerFaceColor','w','MarkerSize',7);
                                 end
                             end
@@ -521,25 +531,23 @@ for knorm = [1,2,3]
                 
                 %% draw fumaroles
                 if draw_fumaroles == 1
-                    % plot(MUDPOTS.Xp,    MUDPOTS.Yp,'kd','MarkerFaceColor','w','MarkerSize',7);
-                    % plot(FUMAROLES.Xp,FUMAROLES.Yp,'kd','MarkerFaceColor','r','MarkerSize',7);
                     switch knorm
                         case 1
                             for i=1:numel(FUMAROLES.Xp)
-                                if abs(FUMAROLES.Xp(i)-SLICES.Xp(kslice)) < 10*rsearch
-                                    plot(FUMAROLES.Yp(i),FUMAROLES.Zp(i),'kd','MarkerFaceColor','r','MarkerSize',7);
+                                if abs(FUMAROLES.Xp(i)-SLICES.Xp(kslice)) < 1*rsearch
+                                    plot(FUMAROLES.Yp(i),FUMAROLES.Zp(i),'kd','MarkerFaceColor','k','MarkerSize',7);
                                 end
                             end
                         case 2
                             for i=1:numel(FUMAROLES.Yp)
-                                if abs(FUMAROLES.Yp(i)-SLICES.Yp(kslice)) < 10*rsearch
-                                    plot(FUMAROLES.Xp(i),FUMAROLES.Zp(i),'kd','MarkerFaceColor','r','MarkerSize',7);
+                                if abs(FUMAROLES.Yp(i)-SLICES.Yp(kslice)) < 1*rsearch
+                                    plot(FUMAROLES.Xp(i),FUMAROLES.Zp(i),'kd','MarkerFaceColor','k','MarkerSize',7);
                                 end
                             end
                         case 3
                             for i=1:numel(FUMAROLES.Zp)
-                                if FUMAROLES.Zp(i) >= max(SLICES.Zp) % only plot on uppermost slice
-                                   plot(FUMAROLES.Xp,FUMAROLES.Yp,'kd','MarkerFaceColor','r','MarkerSize',7);
+                                if SLICES.Zp(kslice) >= max(SLICES.Zp) % only plot on uppermost slice
+                                   plot(FUMAROLES.Xp,FUMAROLES.Yp,'kd','MarkerFaceColor','k','MarkerSize',7);
                                 end
                             end
                         otherwise
@@ -553,13 +561,13 @@ for knorm = [1,2,3]
                     switch knorm
                         case 1
                             for i=1:numel(TOMO.Xp)
-                                if abs(TOMO.Xp(i)-SLICES.Xp(kslice)) < 10*rsearch
+                                if abs(TOMO.Xp(i)-SLICES.Xp(kslice)) < 1*rsearch
                                     plot(TOMO.Yp(i),TOMO.Zp(i),'ok','MarkerSize',7);
                                 end
                             end
                         case 2
                             for i=1:numel(TOMO.Yp)
-                                if abs(TOMO.Yp(i)-SLICES.Yp(kslice)) < 10*rsearch
+                                if abs(TOMO.Yp(i)-SLICES.Yp(kslice)) < 1*rsearch
                                     plot(TOMO.Xp(i),TOMO.Zp(i),'ok','MarkerSize',7);
                                 end
                             end

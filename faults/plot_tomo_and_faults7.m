@@ -30,6 +30,8 @@ function figfilenames = plot_tomo_and_faults7(TOMO,FAULTS,title_str,BOUNDS,OPTIO
 % 20180531 Kurt Feigl 
 %  Add fumaroles, mudpots to list of arguments
 %  Plot topographic surface
+% 20180601 Kurt Feigl
+%  Correct labels on Y-norm cross sections
 
 % initialize
 kfiles = 0;
@@ -599,11 +601,17 @@ for knorm = [1,2,3]
                     switch knorm
                         case 1
                             title(sprintf('X = %10.1f m',constant_coordinate));
+                            % Yp is positive to Northeast, that is, toward the right  
+                            text(nanmax(BOUNDS.Yp),nanmax(BOUNDS.Zp),'NE','HorizontalAlignment','right','VerticalAlignment','Bottom');
+                            text(nanmin(BOUNDS.Yp),nanmax(BOUNDS.Zp),'SW','HorizontalAlignment','left', 'VerticalAlignment','Bottom');
                         case 2
                             title(sprintf('Y = %10.1f m',constant_coordinate));
                             AX = gca;AX.Clipping='Off';
-                            text(nanmin(BOUNDS.Xp),nanmax(BOUNDS.Zp),'SW','HorizontalAlignment','left','VerticalAlignment','Bottom');
-                            text(nanmax(BOUNDS.Xp),nanmax(BOUNDS.Zp),'NE','HorizontalAlignment','right','VerticalAlignment','Bottom');
+%                             text(nanmin(BOUNDS.Xp),nanmax(BOUNDS.Zp),'SW','HorizontalAlignment','left','VerticalAlignment','Bottom');
+%                             text(nanmax(BOUNDS.Xp),nanmax(BOUNDS.Zp),'NE','HorizontalAlignment','right','VerticalAlignment','Bottom');
+                            % Xp is positive to Southeast, that is, toward the right  
+                            text(nanmax(BOUNDS.Xp),nanmax(BOUNDS.Zp),'SE','HorizontalAlignment','right','VerticalAlignment','Bottom');
+                            text(nanmin(BOUNDS.Xp),nanmax(BOUNDS.Zp),'NW','HorizontalAlignment','left', 'VerticalAlignment','Bottom');
                             AX = gca;AX.Clipping='On';
                         case 3
                             title(sprintf('Z = %7.0f m',constant_coordinate+800));
