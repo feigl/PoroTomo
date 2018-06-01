@@ -53,17 +53,17 @@ set(handle,'PaperUnits','inches');
 set(handle,'Units','inches');
 
 % Set the page size and position to match the figure's dimensions
-PaperPosition = get(handle,'PaperPosition')
+PaperPosition = get(handle,'PaperPosition');
 
 % get the size of the white space
-Position = get(handle,'Position')
-OuterPosition = get(handle,'OuterPosition')
+Position = get(handle,'Position');
+OuterPosition = get(handle,'OuterPosition');
 
 set(handle,'PaperPosition',[0,0,OuterPosition(3),OuterPosition(4)]);
 set(handle,'PaperSize',[OuterPosition(3),OuterPosition(4)]);
 
 % Save the pdf (this is the same method used by "saveas")
-print(handle,'-dpdf',pdfFileName,sprintf('-r%d',dpi))
+print(handle,'-dpdf',pdfFileName,sprintf('-r%d',dpi));
 
 % Restore the previous settings
 set(handle,'PaperType',prePaperType);
