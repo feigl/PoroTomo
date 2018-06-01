@@ -160,7 +160,7 @@ fname_nodes = strcat(dirname,filesep,'MESH_topo_xpypzellipsoid_800/nodes_coords_
 NODES = read_nodes(fname_nodes);
 
 %% read the file containing the list of elements
-dirname = '/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_4_Adjoint_seismic_tomography/MESH_SPECFEM3D'
+dirname =strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_4_Adjoint_seismic_tomography/MESH_SPECFEM3D')
 fname_elements = strcat(dirname,filesep,'MESH_topo_xpypzellipsoid_800/mesh_file')
 ELEMENTS = read_elements(fname_elements);
 
