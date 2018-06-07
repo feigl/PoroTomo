@@ -19,11 +19,12 @@
 %   Revised 1/14/2007
 %   Revised 2018/05/27 Kurt Feigl
 
-function save2pdf(pdfFileName,handle,dpi)
+%function save2pdf(pdfFileName,handle,dpi)
+function save2pdf(pdfFileName)
 
 % Verify correct number of arguments
 %error(nargchk(0,3,nargin));
-narginchk(0,3);
+%narginchk(0,3);
 
 % If no handle is provided, use the current figure as default
 if nargin<1
@@ -31,12 +32,12 @@ if nargin<1
     if fileName == 0; return; end
     pdfFileName = [pathName,fileName];
 end
-if nargin<2 || ishandle(handle)==0  
-    handle = gcf;
-end
-if nargin<3
+% if nargin<2 || ishandle(handle)==0  
+     handle = gcf;
+% end
+% if nargin<3
     dpi = 600;
-end
+% end
 
 % Backup previous settings
 prePaperType = get(handle,'PaperType');
@@ -63,7 +64,8 @@ set(handle,'PaperPosition',[0,0,OuterPosition(3),OuterPosition(4)]);
 set(handle,'PaperSize',[OuterPosition(3),OuterPosition(4)]);
 
 % Save the pdf (this is the same method used by "saveas")
-print(handle,'-dpdf',pdfFileName,sprintf('-r%d',dpi));
+%print(handle,'-dpdf',pdfFileName,sprintf('-r%d',dpi));
+print(pdfFileName,'-dpdf',sprintf('-r%d',dpi));
 
 % Restore the previous settings
 set(handle,'PaperType',prePaperType);

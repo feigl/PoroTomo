@@ -31,7 +31,6 @@ make_slices = 0;  % plot cross sections
 %addpath('/Users/feigl/gipht/utils','-begin'); % needed for colortables
 % addpath(genpath('/Users/feigl/PoroTomo'),'-begin');
 % rmpath(genpath('/Users/feigl/PoroTomo/.git'));
-
 homedir = getenv('HOME')
 addpath(genpath(strcat(homedir,filesep,'Porotomo')),'-begin');
 rmpath(genpath(strcat(homedir,filesep,'Porotomo/.git')));
