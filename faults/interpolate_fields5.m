@@ -5,7 +5,7 @@
 % 20171120 with Lesley - add Matzel's latest
 % 20171205 Kurt for AGU
 % 20180207 Kurt for Stanford
-% 20180211 Kurt for GRL 
+% 20180211 Kurt for GRL
 % 20180507 Kurt for SRL and SSA
 % 20180513 Kurt work on lithologic units
 % example how to make an animation
@@ -22,7 +22,7 @@ tstart = tic;
 
 save_wells  = 0;   % save Z profile
 save_meshes = 0;  % save tomograms on REGULAR 3 D mesh
-make_slices = 1;  % plot cross sections
+make_slices = 0;  % plot cross sections
 
 
 
@@ -79,9 +79,9 @@ utmzone = '11 S' % UTM zone for Brady Hot Springs
 %         469.25       1531.42
 % 20180527 - start with PoroTomo coordinates
 xy = [  0., 1500.; ...
-        0.,    0.; ...
-      500.,    0.; ...
-      500., 1500.];
+    0.,    0.; ...
+    500.,    0.; ...
+    500., 1500.];
 BRADYBOX.Xp = xy(:,1);
 BRADYBOX.Yp = xy(:,2);
 [BRADYBOX.E,BRADYBOX.N] = xy_porotomo2utm(BRADYBOX.Xp,BRADYBOX.Yp);
@@ -100,13 +100,13 @@ BRADYBOX.Yp = xy(:,2);
 BOUNDS.Xp = [-400,900];
 BOUNDS.Yp = [-300,1700];
 BOUNDS.Zp = [0, 490]; % These are Zporotomo coordinates.
-            
-            
+
+
 % make a 3-D bounding box
-[BOX3.Xp,BOX3.Yp,BOX3.Zp] = meshgrid(BOUNDS.Xp,BOUNDS.Yp,BOUNDS.Zp);          
+[BOX3.Xp,BOX3.Yp,BOX3.Zp] = meshgrid(BOUNDS.Xp,BOUNDS.Yp,BOUNDS.Zp);
 [BOX3.E, BOX3.N, BOX3.H] = xyz_porotomo2utm(colvec(BOX3.Xp),colvec(BOX3.Yp),colvec(BOX3.Zp));
 % % make a 2-D bounding box
-% [BOX2.Xp,BOX2.Yp] = meshgrid(BOUNDS.Xp,BOUNDS.Yp,BOUNDS.Zp);          
+% [BOX2.Xp,BOX2.Yp] = meshgrid(BOUNDS.Xp,BOUNDS.Yp,BOUNDS.Zp);
 % [BOX.E,  BOX.N]   = xy_porotomo2utm(colvec(BOX2.Xp),colvec(BOX2.Yp));
 
 
@@ -141,9 +141,9 @@ dY = 25; % meters
 dZ = 25; % meters
 
 [MESH3.Xp,MESH3.Yp,MESH3.Zp] = meshgrid(...
-     [min(BOUNDS.Xp):dX:max(BOUNDS.Xp)]...
+    [min(BOUNDS.Xp):dX:max(BOUNDS.Xp)]...
     ,[min(BOUNDS.Xp):dY:max(BOUNDS.Xp)]...
-    ,[min(BOUNDS.Zp):dZ:max(BOUNDS.Zp)]);          
+    ,[min(BOUNDS.Zp):dZ:max(BOUNDS.Zp)]);
 [MESH3.E, MESH3.N, MESH3.H] = xyz_porotomo2utm(colvec(MESH3.Xp),colvec(MESH3.Yp),colvec(MESH3.Zp));
 MESH3.E = reshape(MESH3.E,size(MESH3.Xp));
 MESH3.N = reshape(MESH3.N,size(MESH3.Xp));
@@ -187,7 +187,7 @@ save('CENTROIDS.mat','-struct','CENTROIDS');
 %geologic_model = 'Jolie'
 geologic_model = 'Siler'
 if strcmp(geologic_model,'Jolie9')
-%    load('/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/faults_for_Cliff/read_and_mesh_faults10.mat'); % Nick's Top9
+    %    load('/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/faults_for_Cliff/read_and_mesh_faults10.mat'); % Nick's Top9
     load(strcat(boxdir,filsep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Siler/Jolie9.mat')); % All faults
 elseif strcmp(geologic_model,'Jolie')
     load(strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Siler/Jolie.mat')); % All faults
@@ -301,14 +301,15 @@ feval(funprint,sprintf('%s_WGS84elevation.pdf',mfilename));
 % obsq = 14 % Nayak20180513 Vp with model resolution
 % obsq = 15 % Siler lithology
 % obsq = 16 % Nayak20180607 Vp3 with model resolution
+% obsq = 17 % Thurber20180504 empirical Vs
 
 obsqmin = 0;
-obsqmax = 15;
+obsqmax = 17;
 
 % dimension
 %obsqs = 10; % for SRL paper
 %obsqs = [0:16] % All
-obsqs = [0,16]; % for debugging
+obsqs = [0,17]; % for debugging
 
 if ismember(9,obsqs) == true
     obsqs=setxor(obsqs,9); % case 9 is not defined
@@ -328,9 +329,9 @@ MESHEDTOMO.tomo = nan(nobsq,MESH3.nx,MESH3.ny,MESH3.nz);
 for obsq = obsqs
     % initialize a few things
     OPTIONS.resolution_threshold = nan;
-    %% read the files   
+    %% read the files
     switch obsq
-         case 0
+        case 0
             %% Get Density from Witter et al.
             % Witter, J. B., D. L. Siler, J. E. Faulds, and N. H. Hinz (2016), 3D
             % geophysical inversion modeling of gravity data to test the 3D geologic
@@ -369,7 +370,7 @@ for obsq = obsqs
             % Transform coordinates into rotated PoroTomo frame (Xp,Yp,Zp)
             [DENSITY.Xp,DENSITY.Yp,DENSITY.Zp] = utm2xyz_porotomo(DENSITY.X,DENSITY.Y,DENSITY.Z);
             save('DENSITY.mat','-struct','DENSITY');
-
+            
         case {1,2,3,4,7,8,11}
             if exist('MATZEL.mat','file') == 2
                 MATZEL = load('MATZEL.mat');
@@ -471,7 +472,7 @@ for obsq = obsqs
                 legend('model nodes','PoroTomo Box');
                 printpdf(sprintf('%s_%03d.pdf',mfilename,nf));
                 
-                               
+                
                 %% make figure in UTM coordinates
                 nf=nf+1;figure(nf);hold on;
                 plot(DENSITY.X,DENSITY.Y,'r.');
@@ -629,9 +630,9 @@ for obsq = obsqs
             title('PoroTomo coordinates');
             legend('model nodes','PoroTomo Box','Thurber origin');
             printpdf(sprintf('%s_%03d.pdf',mfilename,nf));
-                        printpdf(sprintf('%s_%03d.pdf',mfilename,nf));
-            save('VpThurber20170727.mat','-struct','TOMO');          
-         case 10
+            printpdf(sprintf('%s_%03d.pdf',mfilename,nf));
+            save('VpThurber20170727.mat','-struct','TOMO');
+        case 10
             
             %% P-wave velocity from Cliff Thurber
             %             From: Clifford Thurber
@@ -656,7 +657,7 @@ for obsq = obsqs
             % attached Vp model file is in correct PoroTomo coordinates.
             %
             % Cliff
-          
+            
             dirname = strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_2_Seismic_travel_time')
             tomo_filename = 'VpThurber20171123.vel'
             XYZVthurber = load(strcat(dirname,filesep,tomo_filename));
@@ -668,58 +669,82 @@ for obsq = obsqs
             
             % get UTM coordinates
             [TOMO.Eutm,TOMO.Nutm,TOMO.Dutm] = xyz_porotomo2utm(TOMO.Xp,TOMO.Yp,TOMO.Zp);
-                                  
-%             % make figure in PoroTomo coordinates
-%             nf=nf+1;figure(nf);hold on;
-%             plot(TOMO.Xp,TOMO.Yp,'r*');
-%             %plot(BRADYBOX.Xporotomo([1,2,3,4,1]),BRADYBOX.Yporotomo([1,2,3,4,1]),'k-');
-%             plot(BRADYBOX.Xp([1,2,3,4,1]),BRADYBOX.Yp([1,2,3,4,1]),'k-');
-% %            plot(ORIGIN.Xp,ORIGIN.Yp,'ob');
-% %            plot(WELLS.grdsurf.Xp,WELLS.grdsurf.Yp,'k^','MarkerSize',2,'MarkerFaceColor','k');
-%             xlabel('Xporotomo [m]');
-%             ylabel('Yporotomo [m]');
-%             axis equal; axis tight;
-%             title('PoroTomo coordinates');
-%             legend('model nodes','PoroTomo Box','Thurber origin');
-%             printpdf(sprintf('%s_%03d.pdf',mfilename,nf));
+            
+            %             % make figure in PoroTomo coordinates
+            %             nf=nf+1;figure(nf);hold on;
+            %             plot(TOMO.Xp,TOMO.Yp,'r*');
+            %             %plot(BRADYBOX.Xporotomo([1,2,3,4,1]),BRADYBOX.Yporotomo([1,2,3,4,1]),'k-');
+            %             plot(BRADYBOX.Xp([1,2,3,4,1]),BRADYBOX.Yp([1,2,3,4,1]),'k-');
+            % %            plot(ORIGIN.Xp,ORIGIN.Yp,'ob');
+            % %            plot(WELLS.grdsurf.Xp,WELLS.grdsurf.Yp,'k^','MarkerSize',2,'MarkerFaceColor','k');
+            %             xlabel('Xporotomo [m]');
+            %             ylabel('Yporotomo [m]');
+            %             axis equal; axis tight;
+            %             title('PoroTomo coordinates');
+            %             legend('model nodes','PoroTomo Box','Thurber origin');
+            %             printpdf(sprintf('%s_%03d.pdf',mfilename,nf));
             save('VpThurber20171123.mat','-struct','TOMO');
-         case 13           
-             %% P-wave velocity with model resolution from Cliff Thurber
-             %
-             % From: Clifford Thurber Sent: Friday, May 4, 2018 4:00 PM To: Kurt Feigl
-             % Subject: Fwd: PoroTomo Z
-             %
-             % Here is the resolution diagonals, modified to be in the exact same form
-             % as the Vp model.  Resolution is not so great so I recommend a threshold
-             % of 0.1
-             %
-             % An inversion with reduced damping result in much better resolution and a
-             % somewhat rougher model, but that's not what we submitted.
-             %
-             % Cliff
-             %
-             % Begin forwarded message:
-             %
-             % From: Clifford Thurber <clifft@geology.wisc.edu> Subject: Fwd: PoroTomo Z
-             % Date: November 23, 2017 at 10:07:35 AM CST To: Kurt Feigl
-             % <feigl@wisc.edu>
-             %
-             % Well, if it is correct that PoroTomo Z is positive upwards and PoroTomo
-             % Z=0 is at WGS84 elevation of 800 m, then the attached Vp model file is in
-             % correct PoroTomo coordinates.
-             %
-             % Cliff
-             %
-
-          
+        case {13,17}
+            %% obsq = 13 Thurber20180504 P-wave velocity with model resolution from Cliff Thurber
+            
+            % From: Clifford Thurber Sent: Friday, May 4, 2018 4:00 PM To: Kurt Feigl
+            % Subject: Fwd: PoroTomo Z
+            %
+            % Here is the resolution diagonals, modified to be in the exact same form
+            % as the Vp model.  Resolution is not so great so I recommend a threshold
+            % of 0.1
+            %
+            % An inversion with reduced damping result in much better resolution and a
+            % somewhat rougher model, but that's not what we submitted.
+            %
+            % Cliff
+            %
+            % Begin forwarded message:
+            %
+            % From: Clifford Thurber <clifft@geology.wisc.edu> Subject: Fwd: PoroTomo Z
+            % Date: November 23, 2017 at 10:07:35 AM CST To: Kurt Feigl
+            % <feigl@wisc.edu>
+            %
+            % Well, if it is correct that PoroTomo Z is positive upwards and PoroTomo
+            % Z=0 is at WGS84 elevation of 800 m, then the attached Vp model file is in
+            % correct PoroTomo coordinates.
+            %
+            % Cliff
+            %
+            
+            
+            %% obsq = 17 Thurber20180504 empirical Vs
+            %              From: Clifford Thurber
+            % Sent: Friday, June 8, 2018 3:51 PM To: Kurt Feigl Subject: Empirical Vs
+            % model
+            %
+            % Hi Kurt.  Here is a Vs model that can be given to Christina along with
+            % the velfile.porotomo Vp model, interpolated onto her grid, to use as a
+            % starting model.  I hope it is reasonably close to reality such that her
+            % inversion can converge.
+            %
+            % FYI, all I did was divide Vp by 2.75 for Vp < 1.8 km/s and divide by 2.0
+            % for Vp >= 1.8 km/s.
+            %
+            % Arbitrary but reasonable.
+            %
+            % Cliff
+            
+            
+            
             %dirname = '/Users/feigl/BoxSync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_2_Seismic_travel_time'
             dirname = strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_2_Seismic_travel_time/Thurber20180504PoroTomo_Z')
-            % read velocity
+            
+            % read P-wave velocity
             tomo_filename = 'velfile.porotomo'
             XYZVthurber = load(strcat(dirname,filesep,tomo_filename));
             % read model resolution
             mres_filename = 'resfile.porotomo'
             XYZRthurber = load(strcat(dirname,filesep,mres_filename));
+            
+            % read empirical S-wave velocity
+            vsem_filename = 'velfileS.porotomo'
+            XYZSthurber = load(strcat(dirname,filesep,vsem_filename));           
             
             % check for consistency
             DX = XYZVthurber(:,1) - XYZRthurber(:,1);
@@ -737,24 +762,116 @@ for obsq = obsqs
                 printpdf('Zdiff.pdf');
                 error('coordinate mismatch');
             end
-
+            
             iok = find(XYZVthurber(:,4) > 0); % find indices of non-zero velocities
             TOMO.Xp = XYZVthurber(iok,1)*1000; % meters short  axis positive toward SE
             TOMO.Yp = XYZVthurber(iok,2)*1000; % meters short axis positive toward  NE
             TOMO.Zp = XYZVthurber(iok,3)*1000; % meters above 800 m
-            TOMO.V  = XYZVthurber(iok,4)*1000; % velocity in meters per second
-            TOMO.R  = XYZRthurber(iok,4)*1000; % model resolution (dimensionless)
+            TOMO.Vp = XYZVthurber(iok,4)*1000; % P-wave velocity in meters per second
+            TOMO.Rm = XYZRthurber(iok,4)*1000; % model resolution (dimensionless)
+            TOMO.Vs = XYZSthurber(iok,4)*1000; % S-wave velocity in meters per second
             
-         
             
-            %            % clip out velocity values where resolution is poor
-            OPTIONS.resolution_threshold = 0.1;  % threshhold value
-            %             OPTIONS.resolution_threshold = 0.05;  % threshhold value
             
-            % get UTM coordinates
+            %% get UTM coordinates
             [TOMO.Eutm,TOMO.Nutm,TOMO.Dutm] = xyz_porotomo2utm(TOMO.Xp,TOMO.Yp,TOMO.Zp);
             
-            save('VpThurber20171123.mat','-struct','TOMO');
+            %% interpolate onto centroids of Morency mesh
+            TOMOFEMMESH = CENTROIDS;
+            FVp = scatteredInterpolant(TOMO.Xp,TOMO.Yp,TOMO.Zp,TOMO.Vp);TOMOFEMMESH.Vp = FVp(CENTROIDS.Xp,CENTROIDS.Yp,CENTROIDS.Zp);
+            FVs = scatteredInterpolant(TOMO.Xp,TOMO.Yp,TOMO.Zp,TOMO.Vs);TOMOFEMMESH.Vs = FVs(CENTROIDS.Xp,CENTROIDS.Yp,CENTROIDS.Zp);
+            FRm = scatteredInterpolant(TOMO.Xp,TOMO.Yp,TOMO.Zp,TOMO.Rm);TOMOFEMMESH.Rm = FRm(CENTROIDS.Xp,CENTROIDS.Yp,CENTROIDS.Zp);
+            % also need density
+            FDkg = scatteredInterpolant(DENSITY.Xp,DENSITY.Yp,DENSITY.Zp,1000*DENSITY.Density_gcm3);
+            TOMOFEMMESH.Density_kg_per_m3 = FDkg(CENTROIDS.Xp,CENTROIDS.Yp,CENTROIDS.Zp);
+                      
+
+            %% Poisson's ratio from Vp/Vs ratio
+            %  https://en.wikipedia.org/wiki/Elastic_modulus
+            TOMOFEMMESH.VpOverVs = TOMOFEMMESH.Vp./TOMOFEMMESH.Vs;
+            TOMOFEMMESH.Poisson = 0.5*((TOMOFEMMESH.VpOverVs.^2) - 2)./((TOMOFEMMESH.VpOverVs.^2)-1);
+            
+            %%  Young's modulus from M
+            % https://en.wikipedia.org/wiki/P-wave_modulus
+            % In linear elasticity, the P-wave modulus M {\displaystyle M} M, also
+            % known as the longitudinal modulus or the constrained modulus, is one of
+            % the elastic moduli available to describe isotropic homogeneous materials.
+            % It is defined as the ratio of axial stress to axial strain in a uniaxial
+            % strain state
+            %     ? z z = M ? z z {\displaystyle \sigma _{zz}=M\epsilon _{zz}}
+            %     {\displaystyle \sigma _{zz}=M\epsilon _{zz}}
+            % where all the other strains ? ? ? {\displaystyle \epsilon _{**}}
+            % {\displaystyle \epsilon _{**}} are zero.
+            % This is equivalent to stating that
+            %     M = ? V P 2 {\displaystyle M=\rho V_{\mathrm {P} }^{2}}
+            %     {\displaystyle M=\rho V_{\mathrm {P} }^{2}}
+            % where VP is the velocity of a P-wave.
+            Mp = TOMOFEMMESH.Density_kg_per_m3 .* (TOMOFEMMESH.Vp).^2;           
+            % Young's modulus
+            TOMOFEMMESH.EYoung  = Mp .* (1 + TOMOFEMMESH.Poisson) .* (1 - 2*TOMOFEMMESH.Poisson) ./ (1 - TOMOFEMMESH.Poisson);
+            
+            
+            %% make table to save as ASCII 
+            T= struct2table(TOMOFEMMESH);
+            %id      Xp         Yp         Zp          E            N          Lat       Lon      ElevWGS84      Vp         Vs       Rm      Density_kg_per_m3    VpOverVs    Poisson       EYoung    
+
+            T.Properties.Description = sprintf('Material properties for PoroTomo on centroids of Morency FEM Mesh');
+            for i=1:numel(T.Properties.VariableNames)
+                vname = char(T.Properties.VariableNames{i});
+                if contains(vname,{'ID'}) == 1
+                    T.Properties.VariableUnits{i} = 'dimless';
+                    T.Properties.VariableDescriptions{i} = 'Element ID number';
+                elseif contains(vname,'EYoung') == 1
+                    T.Properties.VariableUnits{i} = 'Pa';
+                    T.Properties.VariableDescriptions{i} = 'Young\''s modulus';
+                elseif contains(vname,{'Xp','Yp','Zp'}) == 1
+                    T.Properties.VariableUnits{i} = 'm';
+                    T.Properties.VariableDescriptions{i} = 'Rotated PoroTomo coordinates';
+                elseif contains(vname,{'E','N','Elev'}) == 1
+                    T.Properties.VariableUnits{i} = 'm';
+                    T.Properties.VariableDescriptions{i} = 'coordinates in UTM Zone 11';
+                elseif contains(vname,{'Lat','Lon'}) == 1
+                    T.Properties.VariableUnits{i} = 'deg';
+                elseif contains(vname,'VpOverVs') == 1
+                    T.Properties.VariableUnits{i} = 'dimless';
+                    T.Properties.VariableDescriptions{i} = 'empircal';
+                elseif contains(vname,'Vp') == 1
+                    T.Properties.VariableUnits{i} = 'm/s';
+                    T.Properties.VariableDescriptions{i} = 'VpThurber20180504';
+                elseif contains(vname,'Vs') == 1
+                    T.Properties.VariableUnits{i} = 'm/s';
+                    T.Properties.VariableDescriptions{i} = 'EmpiricalVs_from_Thurber20180504';
+                else
+                    T.Properties.VariableUnits{i} = 'dimless';
+                end
+            end
+            T.Properties.Description
+            T.Properties.VariableNames
+            T.Properties.VariableUnits
+            T.Properties.VariableDescriptions
+            
+            %% save as text file
+            %save('VpThurber20171123.mat','-struct','TOMO');           
+            writetable(T,strcat(dirname,filesep,'VpThurber20180504onMorencyMesh.csv'));
+            
+            %% save file as Matlab binary
+            %save('VpThurber20180504onMorencyMesh.mat','-struct','TOMOFEMMESH');
+            save(strcat(dirname,filesep,'VpThurber20180504onMorencyMesh.mat'),'T');
+            
+            %% select quantity for subsequent plotting
+            switch obsq
+                case 13
+                    TOMO.V = TOMO.Vp;
+                    % set threshold to mask velocity values where resolution is poor
+                    OPTIONS.resolution_threshold = 0.1;  % threshhold value
+                case 17
+                    TOMO.V = TOMO.Vs;
+                    OPTIONS.resolution_threshold = NaN;
+                otherwise
+                    error(sprintf('Unknown obsq %d\n',obsq));
+            end
+            
+            
         case 14
             %              %% P-wave velocity with from Avinash Nayak % From: Avinash
             %              Nayak <avinash07guddu@gmail.com>
@@ -787,7 +904,7 @@ for obsq = obsqs
             mres_filename = 'resolution_new.txt'
             XYZRthurber = load(strcat(dirname,filesep,mres_filename));
             [nres,nfour] = size(XYZRthurber)
-
+            
             
             % check for consistency
             if nres < nvel
@@ -796,10 +913,10 @@ for obsq = obsqs
                     XYZRthurber(i,1) = XYZVthurber(i,1);
                     XYZRthurber(i,2) = XYZVthurber(i,2);
                     XYZRthurber(i,3) = XYZVthurber(i,3);
-                    XYZRthurber(i,4) = 0.0;  % set resolution to zero in "last" slice. Is it top or bottom? 
+                    XYZRthurber(i,4) = 0.0;  % set resolution to zero in "last" slice. Is it top or bottom?
                 end
             end
-         
+            
             DX = XYZVthurber(:,1) - XYZRthurber(:,1);
             DY = XYZVthurber(:,2) - XYZRthurber(:,2);
             DZ = XYZVthurber(:,3) - XYZRthurber(:,3);
@@ -815,24 +932,24 @@ for obsq = obsqs
                 printpdf('Zdiff.pdf');
                 error('coordinate mismatch');
             end
-
+            
             iok = find(XYZVthurber(:,4) > 0); % find indices of non-zero velocities
             TOMO.Xp = XYZVthurber(iok,1)*1000; % meters short  axis positive toward SE
             TOMO.Yp = XYZVthurber(iok,2)*1000; % meters short axis positive toward  NE
             TOMO.Zp = XYZVthurber(iok,3)*1000; % meters above 800 m
             TOMO.V  = XYZVthurber(iok,4)*1000; % velocity in meters per second
-            TOMO.R  = XYZRthurber(iok,4)*1000; % model resolution (dimensionless)
+            TOMO.Rm  = XYZRthurber(iok,4)*1000; % model resolution (dimensionless)
             
             %            % clip out velocity values where resolution is poor
             OPTIONS.resolution_threshold = 0.1;  % threshhold value
             %             OPTIONS.resolution_threshold = 0.05;  % threshhold value
-                        
+            
             % get UTM coordinates
             [TOMO.Eutm,TOMO.Nutm,TOMO.Dutm] = xyz_porotomo2utm(TOMO.Xp,TOMO.Yp,TOMO.Zp);
-                                  
+            
             save('VpNayak20180513.mat','-struct','TOMO');
         case 16
-            %% P-wave velocity with from Avinash Nayak 
+            %% P-wave velocity with from Avinash Nayak
             %  On  2018-Jun-07, at 23:24 , Avinash Nayak <avinash07guddu@gmail.com>
             %  wrote:
             %
@@ -859,7 +976,7 @@ for obsq = obsqs
             mres_filename = 'resolution_new3.txt'
             XYZRthurber = load(strcat(dirname,filesep,mres_filename));
             [nres,nfour] = size(XYZRthurber)
-
+            
             
             % check for consistency
             if nres < nvel
@@ -868,10 +985,10 @@ for obsq = obsqs
                     XYZRthurber(i,1) = XYZVthurber(i,1);
                     XYZRthurber(i,2) = XYZVthurber(i,2);
                     XYZRthurber(i,3) = XYZVthurber(i,3);
-                    XYZRthurber(i,4) = 0.0;  % set resolution to zero in "last" slice. Is it top or bottom? 
+                    XYZRthurber(i,4) = 0.0;  % set resolution to zero in "last" slice. Is it top or bottom?
                 end
             end
-         
+            
             DX = XYZVthurber(:,1) - XYZRthurber(:,1);
             DY = XYZVthurber(:,2) - XYZRthurber(:,2);
             DZ = XYZVthurber(:,3) - XYZRthurber(:,3);
@@ -887,21 +1004,21 @@ for obsq = obsqs
                 printpdf('Zdiff.pdf');
                 error('coordinate mismatch');
             end
-
+            
             iok = find(XYZVthurber(:,4) > 0); % find indices of non-zero velocities
             TOMO.Xp = XYZVthurber(iok,1)*1000; % meters short  axis positive toward SE
             TOMO.Yp = XYZVthurber(iok,2)*1000; % meters short axis positive toward  NE
             TOMO.Zp = XYZVthurber(iok,3)*1000; % meters above 800 m
             TOMO.V  = XYZVthurber(iok,4)*1000; % velocity in meters per second
-            TOMO.R  = XYZRthurber(iok,4)*1000; % model resolution (dimensionless)
+            TOMO.Rm  = XYZRthurber(iok,4)*1000; % model resolution (dimensionless)
             
             %            % clip out velocity values where resolution is poor
             OPTIONS.resolution_threshold = 0.1;  % threshhold value
             %             OPTIONS.resolution_threshold = 0.05;  % threshhold value
-                        
+            
             % get UTM coordinates
             [TOMO.Eutm,TOMO.Nutm,TOMO.Dutm] = xyz_porotomo2utm(TOMO.Xp,TOMO.Yp,TOMO.Zp);
-                                  
+            
             save('VpNayak20180607.mat','-struct','TOMO');
         case 6
             %% ZengMASWonDAS
@@ -988,21 +1105,21 @@ for obsq = obsqs
             % 30.0 10.0 527.9
             % 40.0 10.0 536.0
             % 50.0 10.0 537.7
-%           here are the first few lines of 20171208
-%          0         17.20        241.20
-%          17.20         15.10        115.10
-%          32.30          9.80        240.40
-%          42.10         16.20        303.50
-%          58.40         17.30        587.30
-%          75.60         12.70        499.10
-%          88.30         17.20        333.20
-%         105.60         14.00        515.10
-%         119.50         13.20        655.00
-%         132.70         16.30        741.90
-%         149.00         51.00        741.90
-
-% assume   topdepth[m]      bottomdepth[m]  Vs[m]
-
+            %           here are the first few lines of 20171208
+            %          0         17.20        241.20
+            %          17.20         15.10        115.10
+            %          32.30          9.80        240.40
+            %          42.10         16.20        303.50
+            %          58.40         17.30        587.30
+            %          75.60         12.70        499.10
+            %          88.30         17.20        333.20
+            %         105.60         14.00        515.10
+            %         119.50         13.20        655.00
+            %         132.70         16.30        741.90
+            %         149.00         51.00        741.90
+            
+            % assume   topdepth[m]      bottomdepth[m]  Vs[m]
+            
             
             % loop over segments
             
@@ -1022,11 +1139,11 @@ for obsq = obsqs
                 if(exist(modf,'file') == 2)
                     seg_flag(k)=1;
                     vtmp=load(modf);
-%                     %zseg(:,k)=vtmp(:,1); % first column contains depth [ in meters] ** below what elevation?
-%                     zsegs(:,k)=elevation_mean-vtmp(:,1)-800.; % PoroTomo coordinate
-%                     %tseg(:,k)=vtmp(:,2); % what is in second column ?? **
-%                     vsegs(:,k)=vtmp(:,3); % third column contains velocity [in m/s]
-%                     update 20171211
+                    %                     %zseg(:,k)=vtmp(:,1); % first column contains depth [ in meters] ** below what elevation?
+                    %                     zsegs(:,k)=elevation_mean-vtmp(:,1)-800.; % PoroTomo coordinate
+                    %                     %tseg(:,k)=vtmp(:,2); % what is in second column ?? **
+                    %                     vsegs(:,k)=vtmp(:,3); % third column contains velocity [in m/s]
+                    %                     update 20171211
                     tseg1=vtmp(:,1); % first  column contains depth [ in meters] to top     of layer
                     bseg1=vtmp(:,2); % second column contains depth [ in meters] to botttom of layer
                     %zsegs(:,k)=elevation_mean - 800.0 - (tseg1+bseg1)/2.; % PoroTomo vertical coordinate
@@ -1050,7 +1167,7 @@ for obsq = obsqs
             for iz=1:10
                 TOMO.Xp(k1:k1+nn-1) = colvec(segx(isegx));
                 TOMO.Yp(k1:k1+nn-1) = colvec(segy(isegx));
-                % 20171211 - get Zp coordinate of center of segment              
+                % 20171211 - get Zp coordinate of center of segment
                 zp_cable1 = Fget_zp(colvec(segx(isegx)),colvec(segy(isegx)));
                 % subtract depth to obtain PoroTomo Zp coordinate
                 TOMO.Zp(k1:k1+nn-1) = zp_cable1-colvec(dsegs(iz,isegx));
@@ -1106,7 +1223,7 @@ for obsq = obsqs
             title('UTM coordinates');
             legend('model nodes','PoroTomo Box');
             printpdf(sprintf('TEMPERATURE_UTM.pdf'));
-           
+            
             % make figure in PoroTomo coordinates
             nf=nf+1;figure(nf);hold on;
             plot(TEMPERATURE.Xp,TEMPERATURE.Yp,'r.');
@@ -1117,7 +1234,7 @@ for obsq = obsqs
             axis equal; axis tight;
             title('PoroTomo coordinates');
             legend('model nodes','PoroTomo Box');
-            printpdf(sprintf('TEMPERATURE_XpYp.pdf'));         
+            printpdf(sprintf('TEMPERATURE_XpYp.pdf'));
             save('TEMPERATURE.mat','-struct','TEMPERATURE');
         case 15
             %             %% Get Lithology from Siler et al.
@@ -1187,10 +1304,10 @@ for obsq = obsqs
             % 329252.229	4408389.688	1287.5	"Tsl2"
             % 329267.072	4408409.804	1287.5	"Tsl2"
             %
-             
+            
             % Read the file containing density values
             dirname = strcat(boxdir,filesep,'PoroTomo/Task4_Design_Deployment/Subtask4_9_Incorporate_Geologic_Information/SilerBradysGeoModelData')
-            fname_siler_lithology = 'Lithology.pdat'; % 
+            fname_siler_lithology = 'Lithology.pdat'; %
             T=readtable(strcat(dirname,filesep,fname_siler_lithology),'HeaderLines',16,'FileType','text');
             LITHOLOGY = table2struct(T,'ToScalar',true)
             
@@ -1202,7 +1319,7 @@ for obsq = obsqs
             
             % Transform coordinates into rotated PoroTomo frame (Xp,Yp,Zp)
             [LITHOLOGY.Xp,LITHOLOGY.Yp,LITHOLOGY.Zp] = utm2xyz_porotomo(...
-                 colvec(LITHOLOGY.Eutm_in_meters)...
+                colvec(LITHOLOGY.Eutm_in_meters)...
                 ,colvec(LITHOLOGY.Nutm_in_meters)...
                 ,colvec(LITHOLOGY.ElevNAD83_in_meters));
             
@@ -1211,43 +1328,43 @@ for obsq = obsqs
             %LITHCODES.Symbols_List = char(unique(LITHOLOGY.Code))
             T=readtable(strcat(dirname,filesep,'SilerLithologyKey.xlsx'));
             %/Volumes/KForange/Box Sync/PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Siler
-           %LITHCODES.Lithology = strrep(LITHCODES.Lithology,'\t',' ');           
-           %[LITHCODES.ncodes,nchar] = size(LITHCODES.Symbol);
-%             
-%             % add a code for Unknown
-%             LITHCODES.ncodes = LITHCODES.ncodes+1;
-%             LITHCODES.Symbol{end+1} = sprintf('----');
-%             LITHCODES.Lithology{end+1}    = sprintf('unspecified');
-%             LITHCODES.ID(LITHCODES.ncodes)    = LITHCODES.ncodes;
-%             
+            %LITHCODES.Lithology = strrep(LITHCODES.Lithology,'\t',' ');
+            %[LITHCODES.ncodes,nchar] = size(LITHCODES.Symbol);
+            %
+            %             % add a code for Unknown
+            %             LITHCODES.ncodes = LITHCODES.ncodes+1;
+            %             LITHCODES.Symbol{end+1} = sprintf('----');
+            %             LITHCODES.Lithology{end+1}    = sprintf('unspecified');
+            %             LITHCODES.ID(LITHCODES.ncodes)    = LITHCODES.ncodes;
+            %
             %% make a color table
             % for more values, see Color Palette City http://soliton.vm.bytemark.co.uk/pub/cpt-city/
             % use canned values from http://colorbrewer2.org/#type=qualitative&scheme=Paired&n=12
-%             T=readtable(strcat(dirname,filesep,'Paired_12.gpl'),'HeaderLines',6,'FileType','text');
-%             C=table2struct(T,'ToScalar',true);
-%             r1      = C.Var1/256.;C=rmfield(C,'Var1');
-%             g1      = C.Var2/256.;C=rmfield(C,'Var2');
-%             b1      = C.Var3/256.;C=rmfield(C,'Var3');
-%                     
-%             % add the values from the matlab color table named "vga"
-%             LITHCODES.colormap =[r1, g1, b1;vga]; 
-%             
-%             % place gray at the top
-%             LITHCODES.colormap(11,:) = [0, 1, 0]; % green
-%             LITHCODES.colormap(LITHCODES.ncodes,:)  = [0.5, 0.5, 0.5];
-%             % truncate unused values
-%             LITHCODES.colormap=LITHCODES.colormap(1:LITHCODES.ncodes,:);
-%             
-
-% 
+            %             T=readtable(strcat(dirname,filesep,'Paired_12.gpl'),'HeaderLines',6,'FileType','text');
+            %             C=table2struct(T,'ToScalar',true);
+            %             r1      = C.Var1/256.;C=rmfield(C,'Var1');
+            %             g1      = C.Var2/256.;C=rmfield(C,'Var2');
+            %             b1      = C.Var3/256.;C=rmfield(C,'Var3');
+            %
+            %             % add the values from the matlab color table named "vga"
+            %             LITHCODES.colormap =[r1, g1, b1;vga];
+            %
+            %             % place gray at the top
+            %             LITHCODES.colormap(11,:) = [0, 1, 0]; % green
+            %             LITHCODES.colormap(LITHCODES.ncodes,:)  = [0.5, 0.5, 0.5];
+            %             % truncate unused values
+            %             LITHCODES.colormap=LITHCODES.colormap(1:LITHCODES.ncodes,:);
+            %
+            
+            %
             dirname = strcat(boxdir,filesep,'PoroTomo/Task8_Analyze_Data_Collected/Subtask8_9_Geology/Siler')
             T=readtable(strcat(dirname,filesep,'SilerCorrelations.xlsx'),'Sheet',1);
             LITHCODES=table2struct(T,'ToScalar',true)
             LITHCODES.Lithology = strrep(LITHCODES.Lithology,'\t',' ');
             LITHCODES.Symbols_List = char(unique(LITHOLOGY.Code))
-           [LITHCODES.ncodes,nchar] = size(LITHCODES.Symbol);
+            [LITHCODES.ncodes,nchar] = size(LITHCODES.Symbol);
             
-
+            
             LITHCODES.Symbols_List = char(LITHCODES.Symbol);
             LITHCODES.ncodes = numel(LITHCODES.ID)
             LITHCODES.colormap = zeros(LITHCODES.ncodes,3);
@@ -1257,8 +1374,8 @@ for obsq = obsqs
                 LITHCODES.colormap(i,3) = LITHCODES.B(i)/256;
             end
             
-                
-
+            
+            
             % make a figure with a color key
             figure;hold on;
             colcol = [1:LITHCODES.ncodes]';
@@ -1269,7 +1386,7 @@ for obsq = obsqs
                 str1 = char(LITHCODES.Lithology{i});
                 % truncate
                 if numel(str1) > 35
-                    str1 = str1(1:35); 
+                    str1 = str1(1:35);
                 end
                 text(0.,i+0.5,sprintf('%2d %-4s %-35s'...
                     ,LITHCODES.ID(i)...
@@ -1278,7 +1395,7 @@ for obsq = obsqs
                     ,'BackgroundColor','white'...
                     ,'FontName','fixedwidth'...
                     ,'VerticalAlignment','top');
-            end  
+            end
             axis xy;axis tight;
             %axis([-Inf,+Inf,0.5,LITHCODES.ncodes+0.5]);
             set(gca,'XTickLabel','');
@@ -1286,7 +1403,7 @@ for obsq = obsqs
             colorbar;
             %colorbar('YTickLabel',LITHCODES.Lithology);
             feval(funprint,sprintf('lithologic_units'));
-
+            
             LITHOLOGY.ID = zeros(size(LITHOLOGY.Xp));
             for i=1:numel(LITHOLOGY.Code)
                 code1 = char(LITHOLOGY.Code{i});
@@ -1300,13 +1417,13 @@ for obsq = obsqs
                 end
             end
             
-
+            
             save('LITHOLOGY.mat','-struct','LITHOLOGY');
             save('LITHCODES.mat','-struct','LITHCODES');
         otherwise
             error(sprintf('unknown obsq %d\n',obsq));
             %break;
-    end 
+    end
     
     
     
@@ -1327,7 +1444,7 @@ for obsq = obsqs
             TOMO.Yp = MATZEL.Yp;
             %TOMO.Zp = MATZEL.Zp; % assumes ground is horizontal flat surface
             TOMO.Zp = MATZEL.Zpt; % assumes ground has topographic relief
-        case {5,10,13,14,16}
+        case {5,10,13,14,16,17}
             % Thurber Vp
             % 20180526 Cliff wrote:
             %     Going from 0 to surface (where does 490 come from?) does not make
@@ -1337,12 +1454,12 @@ for obsq = obsqs
             % To satisfy the reviewer, for your cross-section plots, please shift the Z
             % coordinate of the top layer of the model upwards by 25 m and leave it at
             % the same velocity, that?s basically what the inversion thinks is the
-            % velocity above the top layer anyway.           
+            % velocity above the top layer anyway.
             itop = find(TOMO.Zp >= 450.);
             TOMO.Zp(itop) = TOMO.Zp(itop) + 25;
-            % 20180607 Model resolution is not defined for early models 
+            % 20180607 Model resolution is not defined for early models
             if ismember(obsq,[5,10]) == 1
-               TOMO.R  = nan(size(TOMO.V));
+                TOMO.Rm  = nan(size(TOMO.V));
             end
             fprintf(1,'%s\n','Thurber');
         case 6
@@ -1357,58 +1474,58 @@ for obsq = obsqs
             TOMO.Yp = TEMPERATURE.Yp;
             TOMO.Zp = TEMPERATURE.Zp;
             TOMO.V  = TEMPERATURE.TemperatureInDegCelsius;
-            TOMO.R  = nan(size(TOMO.V));
+            TOMO.Rm  = nan(size(TOMO.V));
         case 15
             TOMO.Xp = LITHOLOGY.Xp;
             TOMO.Yp = LITHOLOGY.Yp;
             TOMO.Zp = LITHOLOGY.Zp;
             TOMO.V  = LITHOLOGY.ID;
-            TOMO.R  = nan(size(TOMO.V));
+            TOMO.Rm  = nan(size(TOMO.V));
         otherwise
             error(sprintf('unknown obsq %d\n',obsq));
     end
     
     %% where to make slices
     switch obsq
-%         case {0} % Witter Density
-% %             SLICES.Xp = [-400:100:900];
-% %             SLICES.Yp = [-300:100:1700];
-% %             SLICES.Zp = [0 100 200 250 300 350 390 400 410 420 430 440 450];
-%             % Try "flattened cube" at 185 m depth at location of Well 56-1
-%             SLICES.Xp = 24;
-%             SLICES.Yp = 119;
-%             SLICES.Zp = 1277-195-800;
-%         case {2,3,4,7,8,9,11}  % Matzel's area is smaller
-%             SLICES.Xp = [0 50 100 200 270 300 400 500];
-%             SLICES.Yp = [0 300 600 900 1000 1200 1500];
-%             SLICES.Zp = [25   125   225   325   425];
-%         case {1,5,12} % Cliff's models go wider
-%             SLICES.Xp = [-400:100:900];
-%             SLICES.Yp = [-300:100:1700];
-%             SLICES.Zp = [0 100 200 250 300 350 390 400 410 420 430 440 450];
-        case {10,14,16} % P-wave tomography for SRL paper by Parker et al.
+        %         case {0} % Witter Density
+        % %             SLICES.Xp = [-400:100:900];
+        % %             SLICES.Yp = [-300:100:1700];
+        % %             SLICES.Zp = [0 100 200 250 300 350 390 400 410 420 430 440 450];
+        %             % Try "flattened cube" at 185 m depth at location of Well 56-1
+        %             SLICES.Xp = 24;
+        %             SLICES.Yp = 119;
+        %             SLICES.Zp = 1277-195-800;
+        %         case {2,3,4,7,8,9,11}  % Matzel's area is smaller
+        %             SLICES.Xp = [0 50 100 200 270 300 400 500];
+        %             SLICES.Yp = [0 300 600 900 1000 1200 1500];
+        %             SLICES.Zp = [25   125   225   325   425];
+        %         case {1,5,12} % Cliff's models go wider
+        %             SLICES.Xp = [-400:100:900];
+        %             SLICES.Yp = [-300:100:1700];
+        %             SLICES.Zp = [0 100 200 250 300 350 390 400 410 420 430 440 450];
+        case {10,14,16,17} % P-wave tomography for SRL paper by Parker et al.
             SLICES.Xp = [0 250 500];
             SLICES.Yp = [0:300:1500];
-            SLICES.Zp = [1200 1150 1100 1050]-800; 
+            SLICES.Zp = [1200 1150 1100 1050]-800;
         case 6 % for surface waves, do not go too deep
             SLICES.Xp = [0 100 200 300 400];
             SLICES.Yp = [0 200 400 600 800 1000 1200 1400 1500];
             SLICES.Zp = [390 400 410 420 430 440 450];
-%         case 14 % Debug faults
-%             SLICES.Xp = [300];
-%             SLICES.Yp = [600];
-%             SLICES.Zp = [400];
+            %         case 14 % Debug faults
+            %             SLICES.Xp = [300];
+            %             SLICES.Yp = [600];
+            %             SLICES.Zp = [400];
         otherwise
             %error(sprintf('unknown obsq %d\n',obsq));
-%             SLICES.Xp = [-400 0 500 900];
-%             SLICES.Yp = [1500 1200 900 600 300 0];
-%             SLICES.Zp = [1300 1200 1150 1100 1050]-800; 
+            %             SLICES.Xp = [-400 0 500 900];
+            %             SLICES.Yp = [1500 1200 900 600 300 0];
+            %             SLICES.Zp = [1300 1200 1150 1100 1050]-800;
             SLICES.Xp = [0 250 500];
             SLICES.Yp = [0:300:1500];
-            SLICES.Zp = [1200 1150 1100 1050]-800; 
-   end
+            SLICES.Zp = [1200 1150 1100 1050]-800;
+    end
     
-
+    
     
     % set up options
     OPTIONS.nmin = 20; % minimum number of intersecting points to qualify a fault for plot
@@ -1425,59 +1542,59 @@ for obsq = obsqs
         case 0
             title_str = 'Density_from_Witter_et_al';
             TOMO.V = 1000*DENSITY.Density_gcm3;
-            TOMO.R  = nan(size(TOMO.V));
+            TOMO.Rm  = nan(size(TOMO.V));
             OPTIONS.cmap=flipud(colormap('parula'));
             OPTIONS.colorbarlabelstr = 'Density [kg/m^3]';
         case 1
             title_str = 'Vp_MatzelSweepInterfNov2017';
             TOMO.V = MATZEL.Vp;
-            TOMO.R  = nan(size(TOMO.V));           
+            TOMO.Rm  = nan(size(TOMO.V));
             OPTIONS.cmap=flipud(colormap('jet'));
             OPTIONS.colorbarlabelstr = 'Vp [m/s]';
         case 2
             title_str = 'Vs_MatzelSweepInterfNov2017';
             TOMO.V = MATZEL.Vs;
-            TOMO.R  = nan(size(TOMO.V));           
+            TOMO.Rm  = nan(size(TOMO.V));
             OPTIONS.cmap=flipud(colormap('jet'));
             OPTIONS.colorbarlabelstr = 'Vs [m/s]';
         case 3
             title_str = 'Poisson_MatzelSweepInterfNov2017';
             TOMO.V = MATZEL.Poisson;
-            TOMO.R  = nan(size(TOMO.V));            
+            TOMO.Rm  = nan(size(TOMO.V));
             OPTIONS.cmap=flipud(colormap('jet'));
             OPTIONS.colorbarlabelstr = '\nu [dimless]';
         case 4
             title_str = 'EYoung_MatzelSweepInterfNov2017';
             TOMO.V = MATZEL.EYoung/1.e9;% convert from Pa to GPa
-            TOMO.R  = nan(size(TOMO.V));           
+            TOMO.Rm  = nan(size(TOMO.V));
             OPTIONS.cmap=colormap('jet');
             OPTIONS.colorbarlabelstr = 'E [GPa]';
         case 5
             title_str = 'Vp_Thurber_velfile20170727';
             % TOMO.V is defined above
-            TOMO.R  = nan(size(TOMO.V));           
+            TOMO.Rm  = nan(size(TOMO.V));
             OPTIONS.cmap=flipud(colormap('jet'));
             OPTIONS.colorbarlabelstr = 'Vp [m/s]';
             OPTIONS.short_labels = 1;
         case 6
             title_str = 'Vs_MASW_on_DAS'
             % TOMO.V is defined above
-            TOMO.R  = nan(size(TOMO.V));                      
+            TOMO.Rm  = nan(size(TOMO.V));
             OPTIONS.cmap=flipud(colormap('jet'));
             OPTIONS.colorbarlabelstr = 'Vs [m/s]';
         case 7
             title_str = 'Qp_MatzelSweepInterfNov2017';
             TOMO.V = MATZEL.Qp;%
-            TOMO.R  = nan(size(TOMO.V));
+            TOMO.Rm  = nan(size(TOMO.V));
             OPTIONS.cmap=flipud(colormap('summer'));
             OPTIONS.colorbarlabelstr = 'Qp [dimless]';
         case 8
             title_str = 'Qs_MatzelSweepInterfNov2017';
-            TOMO.V = MATZEL.Qs;           
-            TOMO.R  = nan(size(TOMO.V));
+            TOMO.V = MATZEL.Qs;
+            TOMO.Rm  = nan(size(TOMO.V));
             OPTIONS.cmap=flipud(colormap('summer'));
             OPTIONS.colorbarlabelstr = 'Qs [dimless]';
-        case 9          
+        case 9
             %             title_str = 'QpOverQs_MatzelSweepInterfNov2017';
             %             TOMO.V = MATZEL.QpOverQs;%
             %             OPTIONS.cmap=flipud(colormap('winter'));
@@ -1487,7 +1604,7 @@ for obsq = obsqs
         case 10
             title_str = 'Vp_Thurber20171123';
             % TOMO.V is defined above
-            TOMO.R  = nan(size(TOMO.V));
+            TOMO.Rm  = nan(size(TOMO.V));
             OPTIONS.cmap=flipud(colormap('jet'));
             OPTIONS.colorbarlabelstr = 'Vp [m/s]';
             OPTIONS.draw_wells = 0;
@@ -1497,20 +1614,20 @@ for obsq = obsqs
         case 11
             title_str = 'QsOverQp_MatzelSweepInterfNov2017';
             TOMO.V = MATZEL.QsOverQp;%
-            TOMO.R  = nan(size(TOMO.V));
+            TOMO.Rm  = nan(size(TOMO.V));
             %OPTIONS.cmap=colormap('winter');
             OPTIONS.cmap=colormap('jet'); % 2080213
             OPTIONS.colorbarlabelstr = 'Qs/Qp [dimless]';
         case 12
             title_str = 'Temperature20150324';
             TOMO.V = TEMPERATURE.TemperatureInDegCelsius;
-            TOMO.R  = nan(size(TOMO.V));
+            TOMO.Rm  = nan(size(TOMO.V));
             OPTIONS.cmap=flipud(colormap('hot'));
             OPTIONS.colorbarlabelstr = 'Temperature [degC]';
         case 13
             title_str = sprintf('Vp_Thurber20180504');
             % TOMO.V is defined above
-            % TOMO.R is defined above
+            % TOMO.Rm is defined above
             OPTIONS.cmap=flipud(colormap('jet'));
             OPTIONS.colorbarlabelstr = 'Vp [m/s]';
             OPTIONS.draw_wells = 1;
@@ -1522,7 +1639,7 @@ for obsq = obsqs
         case 14
             title_str = sprintf('Vp_Nayak20180513');
             % TOMO.V is defined above
-            % TOMO.R  is defined above
+            % TOMO.Rm  is defined above
             OPTIONS.cmap=flipud(colormap('jet'));
             OPTIONS.colorbarlabelstr = 'Vp [m/s]';
             OPTIONS.draw_wells = 1;
@@ -1536,7 +1653,7 @@ for obsq = obsqs
         case 15
             title_str = sprintf('SilerLithology');
             % TOMO.V is defined above
-            TOMO.R  = nan(size(TOMO.V));
+            TOMO.Rm  = nan(size(TOMO.V));
             OPTIONS.cmap=colormap(LITHCODES.colormap);
             OPTIONS.colorbarlabelstr = 'Siler Lithologic ID';
             OPTIONS.draw_wells = 1;
@@ -1548,7 +1665,7 @@ for obsq = obsqs
         case 16
             title_str = sprintf('Vp_Nayak20180607');
             % TOMO.V is defined above
-            % TOMO.R  is defined above
+            % TOMO.Rm  is defined above
             OPTIONS.cmap=flipud(colormap('jet'));
             OPTIONS.colorbarlabelstr = 'Vp [m/s]';
             OPTIONS.draw_wells = 1;
@@ -1557,6 +1674,18 @@ for obsq = obsqs
             %OPTIONS.short_labels = 0;
             OPTIONS.draw_points = 1;
             OPTIONS.draw_curves = 1;
+            OPTIONS.short_labels = 1; % no details
+            OPTIONS.contours = 1;
+        case 17
+            title_str = sprintf('Vs_Thurber20180504');
+            % TOMO.V is defined above
+            % TOMO.Rm is defined above
+            OPTIONS.cmap=flipud(colormap('jet'));
+            OPTIONS.colorbarlabelstr = 'Vs [m/s]';
+            OPTIONS.draw_wells = 1;
+            OPTIONS.draw_topo = 0; % not fully implemented yet
+            OPTIONS.draw_box  = 1;
+            %OPTIONS.short_labels = 0;
             OPTIONS.short_labels = 1; % no details
             OPTIONS.contours = 1;
         otherwise
@@ -1577,8 +1706,8 @@ for obsq = obsqs
     TOMO.Yp = TOMO.Yp(iok);
     TOMO.Zp = TOMO.Zp(iok);
     TOMO.V = TOMO.V(iok);
-    if isfield(TOMO,'R') 
-        TOMO.R = TOMO.R(iok);
+    if isfield(TOMO,'R')
+        TOMO.Rm = TOMO.Rm(iok);
     end
     
     %% set up plots
@@ -1595,6 +1724,10 @@ for obsq = obsqs
             OPTIONS.vmin=1000; % m/s % one scale for all plots of Vp
             OPTIONS.vmax=3000; % m/s
             OPTIONS.interpolation_method = 'linear';
+        case 17
+            OPTIONS.vmin= 200; % m/s % one scale for all plots of Vs
+            OPTIONS.vmax=1800; % m/s
+            OPTIONS.interpolation_method = 'linear';
         case 6
             OPTIONS.vmin= 200; % Dante's choice
             OPTIONS.vmax= 800; %
@@ -1605,8 +1738,8 @@ for obsq = obsqs
             %OPTIONS.interpolation_method = 'linear';
             OPTIONS.interpolation_method = 'natural';
             %OPTIONS.interpolation_method = 'nearest';
-       case 15 % Lithology
-            OPTIONS.vmin=0; % 
+        case 15 % Lithology
+            OPTIONS.vmin=0; %
             OPTIONS.vmax=LITHCODES.ncodes;
             OPTIONS.interpolation_method = 'nearest';
         otherwise
@@ -1616,7 +1749,7 @@ for obsq = obsqs
     
     %% choose the search radius
     switch obsq
-        case {0,1,2,3,4,7,8,9,10,11,13,14,15,16}
+        case {0,1,2,3,4,7,8,9,10,11,13,14,15,16,17}
             rsearch = 50; % search radius in meters
         case 12
             rsearch = 500;
@@ -1633,7 +1766,7 @@ for obsq = obsqs
     switch obsq
         case 0
             OPTIONS.extrapolation_method = 'nearest';
-        case {1,2,3,4,5,6,7,8,9,10,11,13,14,16}
+        case {1,2,3,4,5,6,7,8,9,10,11,13,14,16,17}
             OPTIONS.extrapolation_method = 'none';
         case {12,15}
             OPTIONS.extrapolation_method = 'none';
@@ -1648,8 +1781,8 @@ for obsq = obsqs
         otherwise
             OPTIONS.padding = 50;
     end
-
-            
+    
+    
     
     %% make a histogram
     figure;
@@ -1665,7 +1798,7 @@ for obsq = obsqs
         WELLS.tomonames{j} = title_str;
         WELLS.tomoids(j) = obsqs(j);
         WELLS.tomoZp     = zprof; %  Zcoordinate
-       %WELLS.colorbarlabelstr{j} = OPTIONS.colorbarlabelstr; % units
+        %WELLS.colorbarlabelstr{j} = OPTIONS.colorbarlabelstr; % units
         WELLS.units{j} = OPTIONS.colorbarlabelstr; % units
         
         %Finterp3 = scatteredInterpolant(TOMO.Xp,TOMO.Yp,TOMO.Zp,TOMO.V,'nearest','nearest');
@@ -1699,34 +1832,34 @@ for obsq = obsqs
         Finterp3 = scatteredInterpolant(TOMO.Xp,TOMO.Yp,TOMO.Zp,TOMO.V,OPTIONS.interpolation_method,OPTIONS.extrapolation_method);
         MESHEDTOMO.tomo(ii,:,:,:) = Finterp3(MESH3.Xp,MESH3.Yp,MESH3.Zp);
     end
-      
-        
-
-        
-
-        
-        
+    
+    
+    
+    
+    
+    
+    
     
     
     %% make the plots with slices
-%    figfilenames = plot_tomo_and_faults3(TOMO,FAULTS,title_str,SLICES,OPTIONS,funprint,rsearch,WELLS,elev_mean,BRADY2DGRID);    
+    %    figfilenames = plot_tomo_and_faults3(TOMO,FAULTS,title_str,SLICES,OPTIONS,funprint,rsearch,WELLS,elev_mean,BRADY2DGRID);
     % 20180211 for SRL paper only
     %figfilenames = plot_tomo_and_faults4(TOMO,FAULTS,title_str,SLICES,OPTIONS,funprint,rsearch,WELLS,elev_mean,BRADY2DGRID);
     
     % try "flattened cube"
-     OPTIONS.flattened_cube = 0;
+    OPTIONS.flattened_cube = 0;
     %OPTIONS.contours = 0;
-     OPTIONS.geologic_model = geologic_model;
-     OPTIONS.draw_box = 1;
-     title_str = strcat(title_str,'_with_',geologic_model,'_faults')
-     
-     if make_slices == 1
-         OPTIONS.short_labels = 0; % show details
+    OPTIONS.geologic_model = geologic_model;
+    OPTIONS.draw_box = 1;
+    title_str = strcat(title_str,'_with_',geologic_model,'_faults')
+    
+    if make_slices == 1
+        OPTIONS.short_labels = 0; % show details
         %OPTIONS.short_labels = 1; % no details
-         figfilenames = plot_tomo_and_faults7(TOMO,FAULTS,title_str,BOUNDS,OPTIONS,funprint,rsearch,WELLS,elev_mean,BRADY2DGRID,SLICES,BRADYBOX...
-             ,FUMAROLES,MUDPOTS);
-     end
-
+        figfilenames = plot_tomo_and_faults7(TOMO,FAULTS,title_str,BOUNDS,OPTIONS,funprint,rsearch,WELLS,elev_mean,BRADY2DGRID,SLICES,BRADYBOX...
+            ,FUMAROLES,MUDPOTS);
+    end
+    
     %close all;
 end % loop over obsq
 if save_wells == 1
@@ -1740,7 +1873,7 @@ if save_meshes == 1
     save('MESHEDTOMO.mat','-struct','MESHEDTOMO');
 end
 
-        
+
 
 
 
