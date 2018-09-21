@@ -46,11 +46,17 @@ tstart = tic;
 % set faults
 if exist('OPTIONS','var') == 1
     OPTIONS
-    if isfield(OPTIONS,'vmin') == 0
-        OPTIONS.vmin = nan;
+    if isfield(OPTIONS,'vmin') ~= 1
+        vmin=OPTIONS.vmin;
+    else
+        %vmin=nanmin(colvec(TOMO.V));
+        vmin = nan;
     end
-    if isfield(OPTIONS,'vmax') == 0
-        OPTIONS.vmax =nan;
+    if isfield(OPTIONS,'vmax') == 1
+        vmax=OPTIONS.vmax;
+    else
+        %vmax=nanmax(colvec(TOMO.V));
+        vmax = nan;
     end
     if isfield(OPTIONS,'cmap') == 1
         cmap=OPTIONS.cmap;
@@ -310,8 +316,8 @@ for knorm = [1,2,3]
                 
                 %% setting the velocity range for plotting
                 % set the color table based on manual input
-                if isfinite(OPTIONS.vmin) == 1 && isfinite(OPTIONS.vmax)==1
-                    caxis([OPTIONS.vmin,OPTIONS.vmax]);
+                if isfinite(vmin) == 1 && isfinite(vmax)==1
+                    caxis([vmin,vmax]);
                     caxis manual;
                 else
                     % set the color table bounds automatically for each
