@@ -17,3 +17,8 @@ Wed Feb 28 12:15:18 CST 2018
    573    12:08    rsync -rav * /mnt/t31/PoroTomo/SOFTWARE
 
 
+Thu Sep  6 13:33:51 CDT 2018
+brady% rsync -rav * askja.ssec.wisc.edu:/s11/PoroTomo/SOFTWARE
+
+
+
