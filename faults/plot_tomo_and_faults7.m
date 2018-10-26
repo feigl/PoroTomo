@@ -156,6 +156,14 @@ nxslices = numel(SLICES.Xp)
 nyslices = numel(SLICES.Yp)
 nzslices = numel(SLICES.Zp)
 
+% %% make a histogram to verify
+% figure;
+% histogram(colvec(TOMO.V));
+% xlabel(title_str);
+% ylabel('Count');
+% title('Before pruning');
+
+
 %% clip out velocity values where resolution is poor
 if resolution_threshold > 0.0 && isfield(TOMO,'R') == 1
     title_str = strcat(title_str,sprintf('_MRES_GT_%02d_percent',100*resolution_threshold))
@@ -170,6 +178,14 @@ if resolution_threshold > 0.0 && isfield(TOMO,'R') == 1
     TOMO.V(iinair) = NaN;
 end
 
+% %%
+% figure;
+% histogram(colvec(TOMO.V));
+% xlabel(title_str);
+% ylabel('Count');
+% title('After pruning');
+
+
 %% loop over normal direction
 for knorm = [1,2,3]
     switch knorm
@@ -182,6 +198,14 @@ for knorm = [1,2,3]
         otherwise
             error(sprintf('unknown knorm = %d\n',knorm));
     end
+    
+%     %% check coordinates
+%     figure;
+%     subplot(1,3,1);histogram(colvec(TOMO.Xp));xlabel('Xp [m]');ylabel('Count');
+%     subplot(1,3,2);histogram(colvec(TOMO.Yp));xlabel('Yp [m]');ylabel('Count');
+%     subplot(1,3,3);histogram(colvec(TOMO.Zp));xlabel('Zp [m]');ylabel('Count');
+
+
     %% loop over slices
     for kslice = 1:nslices
         % select sample points in bounds
@@ -202,6 +226,8 @@ for knorm = [1,2,3]
             numel(ikeep)
             error('miscount 3');
         end
+        
+        
         
         switch knorm
             % build 3-D plaid grid using all 3 coordinates in slicing plane
