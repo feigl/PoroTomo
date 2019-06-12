@@ -1,5 +1,3 @@
-% printpdf
-
 %SAVE2PDF Saves a figure as a properly cropped pdf
 %
 %   save2pdf(pdfFileName,handle,dpi)
@@ -21,11 +19,12 @@
 %   Revised 1/14/2007
 %   Revised 2018/05/27 Kurt Feigl
 
-function printpdf(pdfFileName,handle,dpi)
+%function save2pdf(pdfFileName,handle,dpi)
+function save2pdf(pdfFileName)
 
 % Verify correct number of arguments
 %error(nargchk(0,3,nargin));
-narginchk(0,3);
+%narginchk(0,3);
 
 % If no handle is provided, use the current figure as default
 if nargin<1
@@ -33,12 +32,12 @@ if nargin<1
     if fileName == 0; return; end
     pdfFileName = [pathName,fileName];
 end
-if nargin<2 || ishandle(handle)==0  
-    handle = gcf;
-end
-if nargin<3
+% if nargin<2 || ishandle(handle)==0  
+     handle = gcf;
+% end
+% if nargin<3
     dpi = 600;
-end
+% end
 
 % Backup previous settings
 prePaperType = get(handle,'PaperType');
@@ -58,56 +57,21 @@ set(handle,'Units','inches');
 PaperPosition = get(handle,'PaperPosition');
 
 % get the size of the white space
-Position = get(handle,'Position')
+Position = get(handle,'Position');
 OuterPosition = get(handle,'OuterPosition');
 
-hlabel = sprintf('%s %s %s',pdfFileName, datestr(now,31),getenv('USER'));
-hlabel=strrep(hlabel,'\','\\');
-hlabel=strrep(hlabel,'_','\_');
-
-vlabel = sprintf('%s',pwd);
-vlabel=strrep(vlabel,'\','\\');
-vlabel=strrep(vlabel,'_','\_');
-%vlabel = 'Hello string without slashes'
-
-%labelfig(hlabel,vlabel);
-
-%% write string vertically on the left hand side
-subplot('Position',[0., 0., 0.02 Position(4)-1],'Units','Inches','Parent',handle);
-text(0.,1.,vlabel ...
-            ,'Units','inches'...
-            ,'VerticalAlignment','Top'...
-            ,'HorizontalAlignment','Left'...
-            ,'Clipping','off'...
-            ,'FontName','Courier','FontSize',12 ...
-            ,'Rotation',90);
-axis off
-
-%% write text string horizontally at lower left
-subplot('Position',[0.04, 0.0, Position(3)-1 0.02],'Units','Inches','Parent',handle);
-text(1.,0.,hlabel ...
-            ,'Units','inches'...
-            ,'VerticalAlignment','Bottom'...
-            ,'HorizontalAlignment','Left'...
-            ,'Clipping','off'...
-            ,'FontName','Courier','FontSize',12 ...
-            ,'Rotation',0);
-axis off
-
-
-
-set(handle,'PaperPosition',[0,0,Position(3:4)]);
-set(handle,'PaperSize',Position(3:4));
-
-% set(handle,'PaperPosition',[0,0,OuterPosition(3),OuterPosition(4)]);
-% set(handle,'PaperSize',[OuterPosition(3),OuterPosition(4)]);
+set(handle,'PaperPosition',[0,0,OuterPosition(3),OuterPosition(4)]);
+set(handle,'PaperSize',[OuterPosition(3),OuterPosition(4)]);
 
 % Save the pdf (this is the same method used by "saveas")
-print(handle,'-dpdf',pdfFileName,sprintf('-r%d',dpi));
+%print(handle,'-dpdf',pdfFileName,sprintf('-r%d',dpi));
+print(pdfFileName,'-dpdf',sprintf('-r%d',dpi));
 
-% % Restore the previous settings
+% Restore the previous settings
 set(handle,'PaperType',prePaperType);
 set(handle,'PaperUnits',prePaperUnits);
 set(handle,'Units',preUnits);
 set(handle,'PaperPosition',prePaperPosition);
 set(handle,'PaperSize',prePaperSize);
+return
+end

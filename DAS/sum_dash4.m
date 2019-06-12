@@ -205,4 +205,3 @@ fprintf(1,'Average time per file %.3f seconds\n',toc(tcalc0)/nfiles);
 STR=load(outmat_filename)
 
 diary OFF
-

@@ -1,5 +1,3 @@
-% printpdf
-
 %SAVE2PDF Saves a figure as a properly cropped pdf
 %
 %   save2pdf(pdfFileName,handle,dpi)
@@ -21,7 +19,7 @@
 %   Revised 1/14/2007
 %   Revised 2018/05/27 Kurt Feigl
 
-function printpdf(pdfFileName,handle,dpi)
+function save2pdf2(pdfFileName,handle,dpi)
 
 % Verify correct number of arguments
 %error(nargchk(0,3,nargin));
@@ -37,7 +35,7 @@ if nargin<2 || ishandle(handle)==0
     handle = gcf;
 end
 if nargin<3
-    dpi = 600;
+    dpi = 150;
 end
 
 % Backup previous settings
@@ -55,59 +53,55 @@ set(handle,'PaperUnits','inches');
 set(handle,'Units','inches');
 
 % Set the page size and position to match the figure's dimensions
-PaperPosition = get(handle,'PaperPosition');
+PaperPosition = get(handle,'PaperPosition')
 
 % get the size of the white space
 Position = get(handle,'Position')
-OuterPosition = get(handle,'OuterPosition');
+OuterPosition = get(handle,'OuterPosition')
 
-hlabel = sprintf('%s %s %s',pdfFileName, datestr(now,31),getenv('USER'));
-hlabel=strrep(hlabel,'\','\\');
-hlabel=strrep(hlabel,'_','\_');
+t1=sprintf('%s',strrep(pdfFileName,'_','\_'));
+t2 = datestr(now,31); %31             'yyyy-mm-dd HH:MM:SS'    2000-03-01 15:45:17
+tu=getenv('USER');
+t3=sprintf('%s %s %s',t1,t2,tu);
+t4 = strrep(t3,'\','\\');
+t5 = strrep(t4,'_','\_');
 
-vlabel = sprintf('%s',pwd);
-vlabel=strrep(vlabel,'\','\\');
-vlabel=strrep(vlabel,'_','\_');
-%vlabel = 'Hello string without slashes'
-
-%labelfig(hlabel,vlabel);
-
-%% write string vertically on the left hand side
-subplot('Position',[0., 0., 0.02 Position(4)-1],'Units','Inches','Parent',handle);
-text(0.,1.,vlabel ...
-            ,'Units','inches'...
-            ,'VerticalAlignment','Top'...
-            ,'HorizontalAlignment','Left'...
-            ,'Clipping','off'...
-            ,'FontName','Courier','FontSize',12 ...
-            ,'Rotation',90);
-axis off
+dirname = sprintf('%s',strrep(pwd,'_','\_'));
 
 %% write text string horizontally at lower left
-subplot('Position',[0.04, 0.0, Position(3)-1 0.02],'Units','Inches','Parent',handle);
-text(1.,0.,hlabel ...
+subplot('Position',[0. 0. OuterPosition(3)-1 0.02],'Units','Inches');
+text(1.,0.,t5 ...
             ,'Units','inches'...
             ,'VerticalAlignment','Bottom'...
             ,'HorizontalAlignment','Left'...
             ,'Clipping','off'...
-            ,'FontName','Courier','FontSize',12 ...
+            ,'FontName','Courier','FontSize',7 ...
             ,'Rotation',0);
 axis off
 
 
+%% print the name of the working directory vertically on the left hand side
+subplot('Position',[0. 0. 0.04 OuterPosition(4)],'Units','Inches');
+text(0.,1.,dirname ...
+            ,'Units','inches'...
+            ,'VerticalAlignment','Bottom'...
+            ,'HorizontalAlignment','Left'...
+            ,'Clipping','off'...
+            ,'FontName','Courier','FontSize',7 ...
+            ,'Rotation',90);
+axis off
 
-set(handle,'PaperPosition',[0,0,Position(3:4)]);
-set(handle,'PaperSize',Position(3:4));
-
-% set(handle,'PaperPosition',[0,0,OuterPosition(3),OuterPosition(4)]);
-% set(handle,'PaperSize',[OuterPosition(3),OuterPosition(4)]);
+set(handle,'PaperPosition',[0,0,OuterPosition(3),OuterPosition(4)]);
+set(handle,'PaperSize',[OuterPosition(3),OuterPosition(4)]);
 
 % Save the pdf (this is the same method used by "saveas")
-print(handle,'-dpdf',pdfFileName,sprintf('-r%d',dpi));
+print(handle,'-dpdf',pdfFileName,sprintf('-r%d',dpi))
 
-% % Restore the previous settings
+% Restore the previous settings
 set(handle,'PaperType',prePaperType);
 set(handle,'PaperUnits',prePaperUnits);
 set(handle,'Units',preUnits);
 set(handle,'PaperPosition',prePaperPosition);
 set(handle,'PaperSize',prePaperSize);
+return
+end
