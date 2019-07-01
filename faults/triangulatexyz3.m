@@ -260,7 +260,7 @@ if make_plots == 1
     grid on;
     view([1, -1, 1]);
     %printpng(sprintf('%s_%s.png',mfilename,strrep(titlestr,'/','_')));
-    close all    
+    %close all    
 end
 
 
